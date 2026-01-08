@@ -59,9 +59,22 @@
   - `booking_id` (uuid, foreign key, nullable) - Reference to booking if slot is booked
   - `created_at` (timestamptz) - Record creation timestamp
 
+  ### 5. `astrologers`
+  Stores information about available astrologers
+  - `id` (uuid, primary key) - Unique identifier for each astrologer
+  - `name_en` (text) - Astrologer name in English
+  - `name_hi` (text) - Astrologer name in Hindi
+  - `bio_en` (text) - Biography in English
+  - `bio_hi` (text) - Biography in Hindi
+  - `photo_url` (text) - URL to astrologer's photo
+  - `experience_years` (integer) - Years of experience
+  - `specializations` (text[]) - Array of specializations
+  - `is_active` (boolean) - Whether astrologer is currently active
+  - `created_at` (timestamptz) - Record creation timestamp
+
   ## Security
   - Enable Row Level Security (RLS) on all tables
-  - Create policies for public read access to services and testimonials
+  - Create policies for public read access to services, testimonials, and astrologers
   - Create policies for booking creation (anyone can create)
   - Create policies for booking viewing (only admins for now, can be expanded)
 */
@@ -123,11 +136,26 @@ CREATE TABLE IF NOT EXISTS availability_slots (
   created_at timestamptz DEFAULT now()
 );
 
+-- Create astrologers table
+CREATE TABLE IF NOT EXISTS astrologers (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name_en text NOT NULL,
+  name_hi text NOT NULL,
+  bio_en text NOT NULL,
+  bio_hi text NOT NULL,
+  photo_url text DEFAULT '',
+  experience_years integer NOT NULL DEFAULT 0,
+  specializations text[] DEFAULT '{}',
+  is_active boolean DEFAULT true,
+  created_at timestamptz DEFAULT now()
+);
+
 -- Enable Row Level Security
 ALTER TABLE services ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bookings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE testimonials ENABLE ROW LEVEL SECURITY;
 ALTER TABLE availability_slots ENABLE ROW LEVEL SECURITY;
+ALTER TABLE astrologers ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for services (public read access)
 CREATE POLICY "Anyone can view active services"
@@ -158,12 +186,19 @@ CREATE POLICY "Anyone can view available slots"
   TO public
   USING (true);
 
+-- Create policies for astrologers (public read access to active ones)
+CREATE POLICY "Anyone can view active astrologers"
+  ON astrologers FOR SELECT
+  TO public
+  USING (is_active = true);
+
 -- Create indexes for better query performance
 CREATE INDEX IF NOT EXISTS idx_services_category ON services(category);
 CREATE INDEX IF NOT EXISTS idx_bookings_status ON bookings(status);
 CREATE INDEX IF NOT EXISTS idx_bookings_date ON bookings(preferred_date);
 CREATE INDEX IF NOT EXISTS idx_availability_date ON availability_slots(slot_date);
 CREATE INDEX IF NOT EXISTS idx_testimonials_featured ON testimonials(is_featured);
+CREATE INDEX IF NOT EXISTS idx_astrologers_active ON astrologers(is_active);
 
 -- Insert sample services
 INSERT INTO services (name_en, name_hi, description_en, description_hi, duration_minutes, base_price, icon, category) VALUES
@@ -182,3 +217,10 @@ INSERT INTO testimonials (customer_name, customer_photo, rating, review_en, revi
   ('Priya Sharma', '', 5, 'Very knowledgeable and professional. The Vastu Puja brought peace to our new home. Thank you!', 'बहुत जानकार और पेशेवर। वास्तु पूजा ने हमारे नए घर में शांति ला दी। धन्यवाद!', 'Vastu Shanti Puja', true),
   ('Amit Patel', '', 5, 'Perfect muhurat for our wedding. Everything went smoothly. Grateful for the guidance.', 'हमारी शादी के लिए एकदम सही मुहूर्त। सब कुछ आसानी से हो गया। मार्गदर्शन के लिए आभारी।', 'Marriage Muhurat', true),
   ('Sunita Devi', '', 5, 'The Satyanarayan Puja was performed with great devotion. Blessed to have found such a genuine astrologer.', 'सत्यनारायण पूजा बड़ी भक्ति के साथ की गई। ऐसे सच्चे ज्योतिषी को पाकर धन्य हुए।', 'Satyanarayan Puja', true);
+
+-- Insert sample astrologers
+INSERT INTO astrologers (name_en, name_hi, bio_en, bio_hi, photo_url, experience_years, specializations) VALUES
+  ('Pandit Rajesh Sharma', 'पंडित राजेश शर्मा', 'Experienced Vedic astrologer with 15 years of practice, specializing in Graha Shanti and marriage compatibility.', '15 साल के अनुभव के साथ वैदिक ज्योतिषी, ग्रह शांति और विवाह मिलान में विशेषज्ञ।', '', 15, ARRAY['Vedic Astrology', 'Marriage Compatibility', 'Graha Shanti']),
+  ('Acharya Vikram Singh', 'आचार्य विक्रम सिंह', 'Renowned Vastu expert and ritual performer with over 20 years of experience in traditional Hindu ceremonies.', '20 साल से अधिक अनुभव के साथ प्रसिद्ध वास्तु विशेषज्ञ और पारंपरिक हिंदू समारोहों के कलाकार।', '', 20, ARRAY['Vastu Shastra', 'Puja Rituals', 'Havan Ceremonies']),
+  ('Dr. Priya Gupta', 'डॉ. प्रिया गुप्ता', 'PhD in Astrology with expertise in Navgraha Puja and spiritual counseling.', 'ज्योतिष में पीएचडी के साथ नवग्रह पूजा और आध्यात्मिक परामर्श में विशेषज्ञता।', '', 12, ARRAY['Navgraha Puja', 'Spiritual Counseling', 'Remedial Measures']),
+  ('Pandit Anil Kumar', 'पंडित अनिल कुमार', 'Traditional priest specializing in Satyanarayan Puja and family rituals.', 'सत्यनारायण पूजा और पारिवारिक अनुष्ठानों में विशेषज्ञ पारंपरिक पुजारी।', '', 18, ARRAY['Satyanarayan Puja', 'Family Rituals', 'Muhurat Determination']);

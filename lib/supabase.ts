@@ -72,3 +72,16 @@ export type Testimonial = {
   is_featured: boolean;
   created_at: string;
 };
+
+export type Astrologer = {
+  id: string;
+  name_en: string;
+  name_hi: string;
+  bio_en: string;
+  bio_hi: string;
+  photo_url: string;
+  experience_years: number;
+  specializations: string[];
+  is_active: boolean;
+  created_at: string;
+};

@@ -21,20 +21,26 @@ export default function Navigation() {
   }, []);
 
   const navItems = [
-    { id: 'home', label: t('Home', 'होम') },
-    { id: 'services', label: t('Services', 'सेवाएं') },
-    { id: 'booking', label: t('Book Now', 'बुक करें') },
-    { id: 'about', label: t('About', 'हमारे बारे में') },
-    { id: 'gallery', label: t('Gallery', 'गैलरी') },
-    { id: 'contact', label: t('Contact', 'संपर्क करें') },
+    { id: 'home', label: t('Home', 'होम'), href: '/' },
+    { id: 'services', label: t('Services', 'सेवाएं'), href: '#services' },
+    { id: 'astrologers', label: t('Astrologers', 'ज्योतिषी'), href: '/astrologers' },
+    { id: 'booking', label: t('Book Now', 'बुक करें'), href: '#booking' },
+    { id: 'about', label: t('About', 'हमारे बारे में'), href: '#about' },
+    { id: 'gallery', label: t('Gallery', 'गैलरी'), href: '#gallery' },
+    { id: 'contact', label: t('Contact', 'संपर्क करें'), href: '#contact' },
+    { id: 'admin', label: t('Admin', 'एडमिन'), href: '/admin' },
   ];
 
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-      setIsMobileMenuOpen(false);
+  const handleNavClick = (item: typeof navItems[0]) => {
+    if (item.href.startsWith('#')) {
+      const element = document.getElementById(item.href.slice(1));
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      window.location.href = item.href;
     }
+    setIsMobileMenuOpen(false);
   };
 
   return (
@@ -49,7 +55,7 @@ export default function Navigation() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
-          <div className="flex items-center space-x-3 cursor-pointer" onClick={() => scrollToSection('home')}>
+          <div className="flex items-center space-x-3 cursor-pointer" onClick={() => window.location.href = '/'}>
             <div className="w-12 h-12 bg-gradient-to-br from-saffron-500 to-gold-500 rounded-full flex items-center justify-center animate-glow">
               <span className="text-white text-2xl">ॐ</span>
             </div>
@@ -67,7 +73,7 @@ export default function Navigation() {
             {navItems.map((item) => (
               <button
                 key={item.id}
-                onClick={() => scrollToSection(item.id)}
+                onClick={() => handleNavClick(item)}
                 className="text-gray-700 dark:text-gray-300 hover:text-saffron-600 dark:hover:text-saffron-400 transition-colors font-medium"
               >
                 {item.label}
@@ -113,7 +119,7 @@ export default function Navigation() {
             {navItems.map((item) => (
               <button
                 key={item.id}
-                onClick={() => scrollToSection(item.id)}
+                onClick={() => handleNavClick(item)}
                 className="block w-full text-left px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-saffron-50 dark:hover:bg-saffron-900/20 hover:text-saffron-600 dark:hover:text-saffron-400 transition-colors"
               >
                 {item.label}
