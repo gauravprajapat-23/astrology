@@ -70,6 +70,12 @@ export type Testimonial = {
   review_hi: string;
   ritual_name: string;
   is_featured: boolean;
+  email: string;
+  phone: string;
+  service_used: string;
+  status: string;
+  verified: boolean;
+  response: string;
   created_at: string;
 };
 
@@ -112,6 +118,20 @@ export type CarouselItem = {
   link: string;
   is_active: boolean;
   sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type GalleryImage = {
+  id: string;
+  title_en: string;
+  title_hi: string;
+  image_url: string;
+  description_en: string;
+  description_hi: string;
+  category: string;
+  sort_order: number;
+  is_active: boolean;
   created_at: string;
   updated_at: string;
 };

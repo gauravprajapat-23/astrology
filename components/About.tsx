@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
-import { FiChevronLeft, FiChevronRight, FiStar } from 'react-icons/fi';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FiChevronLeft, FiChevronRight, FiStar, FiAward, FiUsers, FiTrendingUp } from 'react-icons/fi';
 import { supabase, type Testimonial } from '@/lib/supabase';
 import { useLanguage } from '@/lib/contexts/LanguageContext';
 
@@ -36,35 +36,132 @@ export default function About() {
     setCurrentIndex(index);
   }, []);
 
+  const stats = [
+    {
+      icon: FiTrendingUp,
+      number: '15+',
+      label: t('Years Experience', 'वर्षों का अनुभव'),
+      gradient: 'from-amber-500 to-orange-500',
+      bgGradient: 'from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20'
+    },
+    {
+      icon: FiUsers,
+      number: '1000+',
+      label: t('Happy Clients', 'खुश ग्राहक'),
+      gradient: 'from-rose-500 to-pink-500',
+      bgGradient: 'from-rose-50 to-pink-50 dark:from-rose-900/20 dark:to-pink-900/20'
+    },
+    {
+      icon: FiAward,
+      number: '50+',
+      label: t('Ritual Types', 'अनुष्ठान प्रकार'),
+      gradient: 'from-violet-500 to-purple-500',
+      bgGradient: 'from-violet-50 to-purple-50 dark:from-violet-900/20 dark:to-purple-900/20'
+    },
+    {
+      icon: FiStar,
+      number: '100%',
+      label: t('Satisfaction', 'संतुष्टि'),
+      gradient: 'from-emerald-500 to-teal-500',
+      bgGradient: 'from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20'
+    },
+  ];
+
   return (
-    <section id="about" className="py-12 sm:py-16 md:py-20 bg-gradient-to-b from-saffron-50 to-white dark:from-gray-800 dark:to-gray-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 md:gap-12 items-center mb-12 sm:mb-16 md:mb-20">
+    <section id="about" className="relative py-16 sm:py-20 lg:py-28 bg-gradient-to-b from-amber-50/50 via-white to-rose-50/30 dark:from-gray-800/50 dark:via-gray-900 dark:to-slate-900/50 overflow-hidden">
+      {/* Background Decorations */}
+      <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.08]">
+        <div className="absolute inset-0 bg-mandala bg-repeat"></div>
+      </div>
+      
+      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-amber-400/10 to-rose-400/10 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-br from-orange-400/10 to-pink-400/10 rounded-full blur-3xl"></div>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* About Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center mb-20 sm:mb-28 lg:mb-32">
+          {/* Image Side */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.6 }}
+            className="relative"
           >
-            <img
-              src="https://images.pexels.com/photos/8844892/pexels-photo-8844892.jpeg?auto=compress&cs=tinysrgb&w=800"
-              alt="Pandit Ji"
-              className="rounded-2xl shadow-2xl w-full h-auto max-h-[300px] sm:max-h-[400px] md:max-h-[500px] object-cover"
-              loading="lazy"
-            />
+            <div className="relative group">
+              {/* Decorative Frame */}
+              <div className="absolute -inset-4 bg-gradient-to-br from-amber-500 via-orange-500 to-rose-500 rounded-3xl blur-2xl opacity-20 group-hover:opacity-30 transition-opacity duration-500"></div>
+              
+              {/* Main Image */}
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl">
+                <img
+                  src="https://images.pexels.com/photos/8844892/pexels-photo-8844892.jpeg?auto=compress&cs=tinysrgb&w=800"
+                  alt="Pandit Ji"
+                  className="w-full h-[400px] sm:h-[500px] lg:h-[600px] object-cover transform group-hover:scale-105 transition-transform duration-700"
+                  loading="lazy"
+                />
+                
+                {/* Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+                
+                {/* Decorative Corner Elements */}
+                <div className="absolute top-4 left-4 w-16 h-16 border-t-4 border-l-4 border-amber-400 rounded-tl-2xl"></div>
+                <div className="absolute bottom-4 right-4 w-16 h-16 border-b-4 border-r-4 border-rose-400 rounded-br-2xl"></div>
+              </div>
+
+              {/* Floating Badge */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.3, type: "spring" }}
+                className="absolute -bottom-6 -right-6 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-4 sm:p-6 border-4 border-amber-500"
+              >
+                <div className="text-center">
+                  <div className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-amber-600 to-rose-600 bg-clip-text text-transparent mb-1">
+                    15+
+                  </div>
+                  <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-semibold">
+                    {t('Years', 'वर्ष')}
+                  </div>
+                </div>
+              </motion.div>
+            </div>
           </motion.div>
 
+          {/* Content Side */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.6 }}
+            className="space-y-6 sm:space-y-8"
           >
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-heading font-bold text-saffron-600 dark:text-saffron-400 mb-4 sm:mb-6">
-              {t('About Our Astrologer', 'हमारे ज्योतिषी के बारे में')}
+            {/* Badge */}
+            <motion.div
+              initial={{ scale: 0 }}
+              whileInView={{ scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="inline-block"
+            >
+              <div className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-amber-100 to-rose-100 dark:from-amber-900/30 dark:to-rose-900/30 rounded-full border border-amber-200 dark:border-amber-700/30">
+                <div className="w-2 h-2 bg-gradient-to-r from-amber-500 to-rose-500 rounded-full animate-pulse"></div>
+                <span className="text-sm font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider">
+                  {t('Master Astrologer', 'मास्टर ज्योतिषी')}
+                </span>
+              </div>
+            </motion.div>
+
+            {/* Heading */}
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-serif font-bold leading-tight">
+              <span className="bg-gradient-to-r from-amber-600 via-orange-600 to-rose-600 dark:from-amber-400 dark:via-orange-400 dark:to-rose-400 bg-clip-text text-transparent">
+                {t('About Our Astrologer', 'हमारे ज्योतिषी के बारे में')}
+              </span>
             </h2>
 
-            <div className="space-y-3 sm:space-y-4 text-gray-700 dark:text-gray-300">
+            {/* Description */}
+            <div className="space-y-4 sm:space-y-5 text-gray-700 dark:text-gray-300">
               <p className="text-base sm:text-lg leading-relaxed">
                 {t(
                   'With over 15 years of experience in Vedic astrology and Hindu rituals, Pandit Shri Ramesh Sharma has guided thousands of devotees towards spiritual enlightenment and worldly success.',
@@ -78,114 +175,171 @@ export default function About() {
                   'प्राचीन वैदिक शास्त्रों और पारंपरिक अनुष्ठानों में प्रशिक्षित, हमारी सेवाएं प्रामाणिक प्रथाओं को आधुनिक सुविधा के साथ जोड़ती हैं। प्रत्येक अनुष्ठान परम भक्ति और पवित्र परंपराओं के पालन के साथ किया जाता है।'
                 )}
               </p>
+            </div>
 
-              <div className="grid grid-cols-2 gap-3 sm:gap-4 pt-4 sm:pt-6">
-                <div className="bg-white dark:bg-gray-800 p-4 sm:p-5 md:p-6 rounded-xl shadow-lg">
-                  <div className="text-xl sm:text-2xl md:text-3xl font-bold text-saffron-600 dark:text-saffron-400 mb-1 sm:mb-2">
-                    15+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-2 gap-4 sm:gap-5 pt-4">
+              {stats.map((stat, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  className="group relative"
+                >
+                  <div className={`absolute inset-0 bg-gradient-to-br ${stat.bgGradient} rounded-2xl transform group-hover:scale-105 transition-transform duration-300`}></div>
+                  <div className="relative p-5 sm:p-6">
+                    <div className={`w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br ${stat.gradient} rounded-xl flex items-center justify-center mb-3 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                      <stat.icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                    </div>
+                    <div className={`text-2xl sm:text-3xl font-bold bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent mb-2`}>
+                      {stat.number}
+                    </div>
+                    <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 font-medium leading-snug">
+                      {stat.label}
+                    </div>
                   </div>
-                  <div className="text-xs sm:text-sm md:text-base text-gray-600 dark:text-gray-400">
-                    {t('Years Experience', 'वर्षों का अनुभव')}
-                  </div>
-                </div>
-
-                <div className="bg-white dark:bg-gray-800 p-4 sm:p-5 md:p-6 rounded-xl shadow-lg">
-                  <div className="text-xl sm:text-2xl md:text-3xl font-bold text-saffron-600 dark:text-saffron-400 mb-1 sm:mb-2">
-                    1000+
-                  </div>
-                  <div className="text-xs sm:text-sm md:text-base text-gray-600 dark:text-gray-400">
-                    {t('Happy Clients', 'खुश ग्राहक')}
-                  </div>
-                </div>
-
-                <div className="bg-white dark:bg-gray-800 p-4 sm:p-5 md:p-6 rounded-xl shadow-lg">
-                  <div className="text-xl sm:text-2xl md:text-3xl font-bold text-saffron-600 dark:text-saffron-400 mb-1 sm:mb-2">
-                    50+
-                  </div>
-                  <div className="text-xs sm:text-sm md:text-base text-gray-600 dark:text-gray-400">
-                    {t('Ritual Types', 'अनुष्ठान प्रकार')}
-                  </div>
-                </div>
-
-                <div className="bg-white dark:bg-gray-800 p-4 sm:p-5 md:p-6 rounded-xl shadow-lg">
-                  <div className="text-xl sm:text-2xl md:text-3xl font-bold text-saffron-600 dark:text-saffron-400 mb-1 sm:mb-2">
-                    100%
-                  </div>
-                  <div className="text-xs sm:text-sm md:text-base text-gray-600 dark:text-gray-400">
-                    {t('Satisfaction', 'संतुष्टि')}
-                  </div>
-                </div>
-              </div>
+                </motion.div>
+              ))}
             </div>
           </motion.div>
         </div>
 
+        {/* Testimonials Section */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-8 sm:mb-12"
+          transition={{ duration: 0.6 }}
+          className="text-center mb-10 sm:mb-16"
         >
-          <h3 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold text-saffron-600 dark:text-saffron-400 mb-3 sm:mb-4">
-            {t('What Our Clients Say', 'हमारे ग्राहक क्या कहते हैं')}
+          {/* Section Badge */}
+          <motion.div
+            initial={{ scale: 0 }}
+            whileInView={{ scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="inline-block mb-6"
+          >
+            <div className="flex items-center space-x-2 px-5 py-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-full border border-amber-200 dark:border-amber-700/30 shadow-lg">
+              <FiStar className="w-4 h-4 text-amber-600 dark:text-amber-400 fill-current" />
+              <span className="text-sm font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
+                {t('Testimonials', 'प्रशंसापत्र')}
+              </span>
+            </div>
+          </motion.div>
+
+          <h3 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold mb-4">
+            <span className="bg-gradient-to-r from-amber-600 via-orange-600 to-rose-600 dark:from-amber-400 dark:via-orange-400 dark:to-rose-400 bg-clip-text text-transparent">
+              {t('What Our Clients Say', 'हमारे ग्राहक क्या कहते हैं')}
+            </span>
           </h3>
-          <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400">
+          <p className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-gray-400 font-light">
             {t('Real experiences from real people', 'वास्तविक लोगों के वास्तविक अनुभव')}
           </p>
         </motion.div>
 
+        {/* Testimonial Carousel */}
         {testimonials.length > 0 && (
-          <div className="relative max-w-4xl mx-auto">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-4 sm:p-6 md:p-8 lg:p-12">
-              <div className="flex justify-center mb-3 sm:mb-4">
-                {[...Array(testimonials[currentIndex]?.rating || 5)].map((_, i) => (
-                  <FiStar key={i} className="w-5 sm:w-6 h-5 sm:h-6 text-gold-500 fill-current" />
-                ))}
-              </div>
+          <div className="relative max-w-5xl mx-auto">
+            <div className="relative">
+              {/* Main Card */}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentIndex}
+                  initial={{ opacity: 0, x: 100 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -100 }}
+                  transition={{ duration: 0.5 }}
+                  className="relative"
+                >
+                  <div className="relative bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-8 sm:p-10 lg:p-14 overflow-hidden">
+                    {/* Background Decoration */}
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-amber-500/5 to-rose-500/5 rounded-full blur-3xl"></div>
+                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-br from-orange-500/5 to-pink-500/5 rounded-full blur-3xl"></div>
 
-              <blockquote className="text-lg sm:text-xl md:text-2xl text-gray-700 dark:text-gray-300 text-center mb-6 sm:mb-8 italic leading-relaxed">
-                &ldquo;{language === 'en' ? testimonials[currentIndex]?.review_en : testimonials[currentIndex]?.review_hi}&rdquo;
-              </blockquote>
+                    {/* Quote Icon */}
+                    <div className="absolute top-6 left-6 text-8xl sm:text-9xl text-amber-500/10 dark:text-amber-400/10 font-serif leading-none">
+                      "
+                    </div>
 
-              <div className="text-center">
-                <div className="font-semibold text-base sm:text-lg text-gray-900 dark:text-white">
-                  {testimonials[currentIndex]?.customer_name}
-                </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">
-                  {testimonials[currentIndex]?.ritual_name}
-                </div>
-              </div>
+                    <div className="relative">
+                      {/* Stars */}
+                      <div className="flex justify-center mb-6 sm:mb-8">
+                        {[...Array(testimonials[currentIndex]?.rating || 5)].map((_, i) => (
+                          <motion.div
+                            key={i}
+                            initial={{ scale: 0, rotate: -180 }}
+                            animate={{ scale: 1, rotate: 0 }}
+                            transition={{ delay: i * 0.1, type: "spring" }}
+                          >
+                            <FiStar className="w-6 sm:w-7 h-6 sm:h-7 text-amber-500 fill-current mx-1" />
+                          </motion.div>
+                        ))}
+                      </div>
+
+                      {/* Review Text */}
+                      <blockquote className="text-xl sm:text-2xl lg:text-3xl text-gray-700 dark:text-gray-300 text-center mb-8 sm:mb-10 italic leading-relaxed font-light">
+                        {language === 'en' ? testimonials[currentIndex]?.review_en : testimonials[currentIndex]?.review_hi}
+                      </blockquote>
+
+                      {/* Customer Info */}
+                      <div className="text-center">
+                        <div className="inline-block">
+                          <div className="font-bold text-lg sm:text-xl text-gray-900 dark:text-white mb-1">
+                            {testimonials[currentIndex]?.customer_name}
+                          </div>
+                          <div className="flex items-center justify-center space-x-2 text-sm sm:text-base text-amber-600 dark:text-amber-400">
+                            <div className="w-1.5 h-1.5 bg-amber-500 rounded-full"></div>
+                            <span>{testimonials[currentIndex]?.ritual_name}</span>
+                            <div className="w-1.5 h-1.5 bg-amber-500 rounded-full"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+
+              {/* Navigation Buttons */}
+              <button
+                onClick={prevTestimonial}
+                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 sm:-translate-x-6 lg:-translate-x-16 w-12 sm:w-14 lg:w-16 h-12 sm:h-14 lg:h-16 bg-white dark:bg-gray-800 rounded-full shadow-2xl flex items-center justify-center text-amber-600 dark:text-amber-400 hover:bg-gradient-to-br hover:from-amber-500 hover:to-rose-500 hover:text-white transition-all duration-300 group border-2 border-amber-200 dark:border-amber-700/30"
+                aria-label="Previous testimonial"
+              >
+                <FiChevronLeft className="w-6 sm:w-7 lg:w-8 h-6 sm:h-7 lg:h-8 transform group-hover:-translate-x-1 transition-transform duration-300" />
+              </button>
+
+              <button
+                onClick={nextTestimonial}
+                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 sm:translate-x-6 lg:translate-x-16 w-12 sm:w-14 lg:w-16 h-12 sm:h-14 lg:h-16 bg-white dark:bg-gray-800 rounded-full shadow-2xl flex items-center justify-center text-amber-600 dark:text-amber-400 hover:bg-gradient-to-br hover:from-amber-500 hover:to-rose-500 hover:text-white transition-all duration-300 group border-2 border-amber-200 dark:border-amber-700/30"
+                aria-label="Next testimonial"
+              >
+                <FiChevronRight className="w-6 sm:w-7 lg:w-8 h-6 sm:h-7 lg:h-8 transform group-hover:translate-x-1 transition-transform duration-300" />
+              </button>
             </div>
 
-            <button
-              onClick={prevTestimonial}
-              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-12 w-8 sm:w-10 md:w-12 h-8 sm:h-10 md:h-12 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center text-saffron-600 dark:text-saffron-400 hover:bg-saffron-50 dark:hover:bg-gray-700 transition-colors"
-              aria-label="Previous testimonial"
-            >
-              <FiChevronLeft className="w-4 sm:w-5 md:w-6 h-4 sm:h-5 md:h-6" />
-            </button>
-
-            <button
-              onClick={nextTestimonial}
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-12 w-8 sm:w-10 md:w-12 h-8 sm:h-10 md:h-12 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center text-saffron-600 dark:text-saffron-400 hover:bg-saffron-50 dark:hover:bg-gray-700 transition-colors"
-              aria-label="Next testimonial"
-            >
-              <FiChevronRight className="w-4 sm:w-5 md:w-6 h-4 sm:h-5 md:h-6" />
-            </button>
-
-            <div className="flex justify-center mt-4 sm:mt-6 md:mt-8 space-x-1 sm:space-x-2">
+            {/* Dots Indicator */}
+            <div className="flex justify-center mt-8 sm:mt-10 space-x-2 sm:space-x-3">
               {testimonials.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => goToTestimonial(index)}
-                  className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all ${
+                  className={`relative h-2 sm:h-2.5 rounded-full transition-all duration-300 ${
                     index === currentIndex
-                      ? 'bg-saffron-600 w-6 sm:w-8'
-                      : 'bg-gray-300 dark:bg-gray-600'
+                      ? 'w-12 sm:w-16 bg-gradient-to-r from-amber-500 to-rose-500'
+                      : 'w-2 sm:w-2.5 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500'
                   }`}
                   aria-label={`Go to testimonial ${index + 1}`}
-                />
+                >
+                  {index === currentIndex && (
+                    <motion.div
+                      layoutId="activeIndicator"
+                      className="absolute inset-0 bg-gradient-to-r from-amber-500 to-rose-500 rounded-full"
+                    />
+                  )}
+                </button>
               ))}
             </div>
           </div>

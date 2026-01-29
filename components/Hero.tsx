@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { FiCalendar, FiPhone } from 'react-icons/fi';
+import { FiCalendar, FiPhone, FiStar } from 'react-icons/fi';
 import { useLanguage } from '@/lib/contexts/LanguageContext';
 
 export default function Hero() {
@@ -18,40 +18,99 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-saffron-50 via-gold-50 to-divine-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 dark:from-gray-900 dark:via-slate-900 dark:to-gray-900"
     >
-      <div className="absolute inset-0 bg-mandala opacity-30"></div>
+      {/* Animated Background Pattern */}
+      <div className="absolute inset-0 opacity-[0.07] dark:opacity-[0.15]">
+        <div className="absolute inset-0 bg-mandala bg-repeat"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/50 to-transparent dark:via-black/30"></div>
+      </div>
 
-      <div className="absolute top-5 sm:top-10 left-3 sm:left-5 w-16 sm:w-20 h-16 sm:h-20 bg-saffron-400/20 rounded-full blur-3xl animate-float"></div>
-      <div className="absolute bottom-5 sm:bottom-10 right-3 sm:right-5 w-20 sm:w-24 h-20 sm:h-24 bg-gold-400/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
+      {/* Floating Orbs */}
+      <div className="absolute top-10 left-5 sm:left-10 lg:left-20 w-32 sm:w-40 lg:w-56 h-32 sm:h-40 lg:h-56 bg-gradient-to-br from-amber-400/30 to-orange-500/30 dark:from-amber-500/20 dark:to-orange-600/20 rounded-full blur-3xl animate-float"></div>
+      <div className="absolute top-1/4 right-10 sm:right-16 lg:right-32 w-40 sm:w-48 lg:w-64 h-40 sm:h-48 lg:h-64 bg-gradient-to-br from-rose-400/30 to-pink-500/30 dark:from-rose-500/20 dark:to-pink-600/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
+      <div className="absolute bottom-20 left-1/4 w-36 sm:w-44 lg:w-60 h-36 sm:h-44 lg:h-60 bg-gradient-to-br from-yellow-400/30 to-amber-500/30 dark:from-yellow-500/20 dark:to-amber-600/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }}></div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-12 sm:py-16 md:py-20 text-center">
+      {/* Decorative Elements */}
+      <div className="absolute top-0 left-0 w-full h-full">
+        <svg className="absolute top-8 left-8 w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 text-amber-500/20 dark:text-amber-400/10 animate-spin-slow" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" strokeWidth="0.5" strokeDasharray="5,5"/>
+          <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" strokeWidth="0.5"/>
+          <circle cx="50" cy="50" r="20" fill="none" stroke="currentColor" strokeWidth="0.5" strokeDasharray="3,3"/>
+        </svg>
+        <svg className="absolute bottom-12 right-12 w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32 text-rose-500/20 dark:text-rose-400/10 animate-spin-slow" style={{ animationDirection: 'reverse' }} viewBox="0 0 100 100">
+          <path d="M50,10 L50,90 M10,50 L90,50 M25,25 L75,75 M75,25 L25,75" stroke="currentColor" strokeWidth="0.5" fill="none"/>
+        </svg>
+      </div>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-24 lg:py-28 text-center">
+        {/* Sacred Symbol */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="mb-4 sm:mb-6 md:mb-8"
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, type: "spring", stiffness: 100 }}
+          className="mb-8 sm:mb-10 lg:mb-12"
         >
-          <div className="inline-block mb-3 sm:mb-4 md:mb-6">
-            <div className="relative">
-              <div className="w-12 sm:w-16 md:w-20 lg:w-24 h-12 sm:h-16 md:h-20 lg:h-24 mx-auto bg-gradient-to-br from-saffron-500 to-gold-500 rounded-full flex items-center justify-center animate-glow">
-                <span className="text-white text-xl sm:text-2xl md:text-3xl lg:text-5xl">ॐ</span>
-              </div>
-              <div className="absolute -bottom-1 sm:-bottom-1 md:-bottom-2 left-1/2 transform -translate-x-1/2 scale-50 sm:scale-60 md:scale-75 lg:scale-100">
+          <div className="relative inline-block">
+            {/* Outer Glow Ring */}
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+              className="absolute inset-0 -m-8 sm:-m-10 lg:-m-12"
+            >
+              <div className="w-full h-full rounded-full border-2 border-dashed border-amber-400/30 dark:border-amber-500/20"></div>
+            </motion.div>
+            
+            {/* Inner Ring */}
+            <motion.div
+              animate={{ rotate: -360 }}
+              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+              className="absolute inset-0 -m-4 sm:-m-5 lg:-m-6"
+            >
+              <div className="w-full h-full rounded-full border border-rose-400/30 dark:border-rose-500/20"></div>
+            </motion.div>
+
+            {/* Om Symbol Container */}
+            <div className="relative w-24 sm:w-28 md:w-32 lg:w-40 h-24 sm:h-28 md:h-32 lg:h-40 mx-auto">
+              <motion.div
+                animate={{ 
+                  boxShadow: [
+                    '0 0 30px rgba(251, 191, 36, 0.3)',
+                    '0 0 60px rgba(251, 191, 36, 0.5)',
+                    '0 0 30px rgba(251, 191, 36, 0.3)',
+                  ]
+                }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="w-full h-full bg-gradient-to-br from-amber-500 via-orange-500 to-rose-500 rounded-full flex items-center justify-center shadow-2xl"
+              >
+                <span className="text-white text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold drop-shadow-lg">ॐ</span>
+              </motion.div>
+              
+              {/* Diya at bottom */}
+              <div className="absolute -bottom-6 sm:-bottom-8 left-1/2 -translate-x-1/2">
                 <Diya />
               </div>
             </div>
           </div>
+        </motion.div>
 
-          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-7xl font-heading font-bold mb-3 sm:mb-4 md:mb-6 bg-gradient-to-r from-saffron-600 to-gold-600 dark:from-saffron-400 dark:to-gold-400 bg-clip-text text-transparent leading-tight">
-            {t('Book Authentic Hindu Rituals', 'प्रामाणिक हिंदू अनुष्ठान बुक करें')}
+        {/* Heading */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+        >
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-serif font-bold mb-4 sm:mb-5 lg:mb-6 leading-tight">
+            <span className="bg-gradient-to-r from-amber-600 via-orange-600 to-rose-600 dark:from-amber-400 dark:via-orange-400 dark:to-rose-400 bg-clip-text text-transparent drop-shadow-sm">
+              {t('Book Authentic Hindu Rituals', 'प्रामाणिक हिंदू अनुष्ठान बुक करें')}
+            </span>
           </h1>
 
-          <h2 className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl 2xl:text-3xl font-hindi font-semibold text-divine-700 dark:text-divine-300 mb-3 sm:mb-4 md:mb-6">
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light italic text-gray-700 dark:text-gray-300 mb-6 sm:mb-8">
             {t('& Unlock Divine Blessings', '& दिव्य आशीर्वाद प्राप्त करें')}
           </h2>
 
-          <p className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl text-gray-700 dark:text-gray-300 max-w-xs sm:max-w-sm md:max-w-md lg:max-w-xl xl:max-w-2xl 2xl:max-w-3xl mx-auto mb-6 sm:mb-8 md:mb-12 leading-relaxed px-1 sm:px-0">
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto mb-10 sm:mb-12 lg:mb-14 leading-relaxed font-light">
             {t(
               'Experience authentic Vedic rituals performed by experienced astrologers. Bring prosperity, peace, and divine blessings to your life.',
               'अनुभवी ज्योतिषियों द्वारा किए गए प्रामाणिक वैदिक अनुष्ठानों का अनुभव करें। अपने जीवन में समृद्धि, शांति और दिव्य आशीर्वाद लाएं।'
@@ -59,73 +118,132 @@ export default function Hero() {
           </p>
         </motion.div>
 
+        {/* CTA Buttons */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4 justify-center items-center w-full px-1 sm:px-0"
+          transition={{ duration: 0.8, delay: 0.5 }}
+          className="flex flex-col sm:flex-row gap-4 sm:gap-5 lg:gap-6 justify-center items-center mb-12 sm:mb-16 lg:mb-20"
         >
           <button
             onClick={scrollToBooking}
-            className="group w-full sm:w-auto px-4 sm:px-5 md:px-6 lg:px-8 py-2.5 sm:py-3 md:py-3.5 lg:py-4 bg-gradient-to-r from-saffron-500 to-gold-500 text-white rounded-full font-semibold text-xs sm:text-sm md:text-base lg:text-lg shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-1.5 sm:space-x-2"
+            className="group relative w-full sm:w-auto px-8 sm:px-10 lg:px-12 py-4 sm:py-5 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white rounded-full font-semibold text-base sm:text-lg lg:text-xl shadow-2xl hover:shadow-amber-500/50 transform hover:scale-105 transition-all duration-300 overflow-hidden"
           >
-            <FiCalendar className="w-3.5 sm:w-4 md:w-5 h-3.5 sm:h-4 md:h-5" />
-            <span className="text-xs sm:text-sm md:text-base lg:text-lg">{t('Book Your Ritual', 'अपना अनुष्ठान बुक करें')}</span>
+            <div className="absolute inset-0 bg-gradient-to-r from-amber-600 via-orange-600 to-rose-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="relative flex items-center justify-center space-x-3">
+              <FiCalendar className="w-5 sm:w-6 h-5 sm:h-6" />
+              <span>{t('Book Your Ritual', 'अपना अनुष्ठान बुक करें')}</span>
+            </div>
           </button>
 
           <button
             onClick={scrollToContact}
-            className="w-full sm:w-auto px-4 sm:px-5 md:px-6 lg:px-8 py-2.5 sm:py-3 md:py-3.5 lg:py-4 bg-white dark:bg-gray-800 text-saffron-600 dark:text-saffron-400 border-2 border-saffron-500 rounded-full font-semibold text-xs sm:text-sm md:text-base lg:text-lg hover:bg-saffron-50 dark:hover:bg-gray-700 transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-1.5 sm:space-x-2"
+            className="group relative w-full sm:w-auto px-8 sm:px-10 lg:px-12 py-4 sm:py-5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-amber-700 dark:text-amber-400 border-2 border-amber-500 dark:border-amber-400 rounded-full font-semibold text-base sm:text-lg lg:text-xl hover:bg-amber-50 dark:hover:bg-gray-700 transform hover:scale-105 transition-all duration-300 shadow-lg"
           >
-            <FiPhone className="w-3.5 sm:w-4 md:w-5 h-3.5 sm:h-4 md:h-5" />
-            <span className="text-xs sm:text-sm md:text-base lg:text-lg">{t('Contact Us', 'हमसे संपर्क करें')}</span>
+            <div className="flex items-center justify-center space-x-3">
+              <FiPhone className="w-5 sm:w-6 h-5 sm:h-6" />
+              <span>{t('Contact Us', 'हमसे संपर्क करें')}</span>
+            </div>
           </button>
         </motion.div>
 
+        {/* Stats Grid */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 0.6 }}
-          className="mt-8 sm:mt-10 md:mt-12 lg:mt-16 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-6 max-w-xs sm:max-w-sm md:max-w-md lg:max-w-xl xl:max-w-2xl 2xl:max-w-4xl mx-auto px-1 sm:px-0"
+          transition={{ duration: 1, delay: 0.7 }}
+          className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-10 max-w-5xl mx-auto"
         >
           {[
-            { number: '1000+', label: t('Rituals Performed', 'अनुष्ठान संपन्न'), labelHi: 'अनुष्ठान संपन्न' },
-            { number: '500+', label: t('Happy Clients', 'खुश ग्राहक'), labelHi: 'खुश ग्राहक' },
-            { number: '15+', label: t('Years Experience', 'वर्षों का अनुभव'), labelHi: 'वर्षों का अनुभव' },
-            { number: '50+', label: t('Ritual Types', 'अनुष्ठान प्रकार'), labelHi: 'अनुष्ठान प्रकार' },
+            { number: '1000+', label: t('Rituals Performed', 'अनुष्ठान संपन्न'), icon: '🕉️' },
+            { number: '500+', label: t('Happy Clients', 'खुश ग्राहक'), icon: '😊' },
+            { number: '15+', label: t('Years Experience', 'वर्षों का अनुभव'), icon: '⭐' },
+            { number: '50+', label: t('Ritual Types', 'अनुष्ठान प्रकार'), icon: '🔥' },
           ].map((stat, index) => (
-            <div key={index} className="text-center">
-              <div className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-saffron-600 dark:text-saffron-400 mb-1 sm:mb-1.5 md:mb-2">
-                {stat.number}
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 + index * 0.1 }}
+              className="relative group"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-rose-500/10 dark:from-amber-500/5 dark:to-rose-500/5 rounded-2xl transform group-hover:scale-105 transition-transform duration-300"></div>
+              <div className="relative bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm p-5 sm:p-6 lg:p-8 rounded-2xl border border-amber-200/50 dark:border-amber-700/30 shadow-lg group-hover:shadow-xl transition-all duration-300">
+                <div className="text-3xl mb-2 sm:mb-3">{stat.icon}</div>
+                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-amber-600 to-rose-600 dark:from-amber-400 dark:to-rose-400 bg-clip-text text-transparent mb-2">
+                  {stat.number}
+                </div>
+                <div className="text-xs sm:text-sm lg:text-base text-gray-700 dark:text-gray-300 font-medium leading-snug">
+                  {stat.label}
+                </div>
               </div>
-              <div className="text-[0.6rem] sm:text-xs md:text-sm lg:text-base xl:text-lg text-gray-600 dark:text-gray-400 leading-snug">
-                {stat.label}
-              </div>
-            </div>
+            </motion.div>
           ))}
         </motion.div>
       </div>
 
-      <div className="absolute bottom-0 left-0 right-0 h-8 sm:h-12 md:h-16 lg:h-20 bg-gradient-to-t from-white dark:from-gray-900 to-transparent"></div>
+      {/* Bottom Fade */}
+      <div className="absolute bottom-0 left-0 right-0 h-20 sm:h-28 lg:h-32 bg-gradient-to-t from-white dark:from-gray-900 to-transparent pointer-events-none"></div>
+
+      <style jsx>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) translateX(0px); }
+          25% { transform: translateY(-20px) translateX(10px); }
+          50% { transform: translateY(-10px) translateX(-10px); }
+          75% { transform: translateY(-15px) translateX(5px); }
+        }
+        
+        @keyframes flame {
+          0%, 100% { transform: scaleY(1) translateY(0); }
+          50% { transform: scaleY(1.1) translateY(-2px); }
+        }
+
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+
+        .animate-flame {
+          animation: flame 1.5s ease-in-out infinite;
+        }
+
+        .animate-spin-slow {
+          animation: spin 30s linear infinite;
+        }
+
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </section>
   );
 }
 
 function Diya() {
   return (
-    <div className="relative w-12 sm:w-16 md:w-20 h-16 sm:h-20 md:h-24">
-      <svg viewBox="0 0 100 120" className="w-full h-full">
-        <ellipse cx="50" cy="80" rx="40" ry="15" fill="#c2410c" />
-        <ellipse cx="50" cy="80" rx="30" ry="10" fill="#ea580c" />
-        <ellipse cx="50" cy="80" rx="20" ry="6" fill="#facc15" />
+    <div className="relative w-14 sm:w-16 lg:w-20 h-20 sm:h-24 lg:h-28">
+      {/* Diya Base */}
+      <svg viewBox="0 0 100 120" className="w-full h-full drop-shadow-lg">
+        <ellipse cx="50" cy="85" rx="45" ry="18" fill="#92400e" />
+        <ellipse cx="50" cy="85" rx="35" ry="12" fill="#b45309" />
+        <ellipse cx="50" cy="85" rx="25" ry="8" fill="#f59e0b" />
+        <ellipse cx="50" cy="85" rx="15" ry="5" fill="#fbbf24" />
       </svg>
-      <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full">
-        <div className="relative w-4 sm:w-5 md:w-6 h-8 sm:h-10 md:h-12">
-          <div className="absolute inset-0 bg-gradient-to-t from-saffron-500 via-gold-400 to-gold-200 rounded-full animate-flame"
-               style={{ filter: 'blur(2px)' }}></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-saffron-600 via-gold-500 to-yellow-300 rounded-full animate-flame"
-               style={{ animationDelay: '0.2s' }}></div>
-          <div className="absolute top-0 left-1/2 w-1.5 sm:w-2 h-2 bg-gradient-to-t from-transparent to-white rounded-full transform -translate-x-1/2 animate-pulse"></div>
+      
+      {/* Flame */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full">
+        <div className="relative w-5 sm:w-6 lg:w-8 h-10 sm:h-12 lg:h-16">
+          {/* Outer glow */}
+          <div className="absolute inset-0 -m-2 bg-gradient-to-t from-transparent via-orange-400/30 to-yellow-400/30 rounded-full blur-lg animate-flame"></div>
+          
+          {/* Main flame */}
+          <div className="absolute inset-0 bg-gradient-to-t from-orange-600 via-orange-400 to-yellow-300 rounded-full animate-flame" style={{ clipPath: 'polygon(50% 0%, 20% 50%, 30% 100%, 50% 85%, 70% 100%, 80% 50%)' }}></div>
+          
+          {/* Inner bright flame */}
+          <div className="absolute inset-0 bg-gradient-to-t from-yellow-400 via-yellow-200 to-white rounded-full animate-flame" style={{ animationDelay: '0.3s', clipPath: 'polygon(50% 10%, 35% 50%, 40% 80%, 50% 70%, 60% 80%, 65% 50%)' }}></div>
+          
+          {/* Top sparkle */}
+          <div className="absolute top-0 left-1/2 w-2 h-2 bg-white rounded-full -translate-x-1/2 -translate-y-1 animate-pulse shadow-lg shadow-yellow-300"></div>
         </div>
       </div>
     </div>

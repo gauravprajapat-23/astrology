@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiUsers, FiCalendar, FiStar, FiSettings, FiUser, FiEdit, FiTrash, FiPlus, FiLogOut, FiX, FiCheck, FiAlertCircle, FiVideo, FiImage, FiSliders, FiBarChart2, FiTrendingUp } from 'react-icons/fi';
-import { supabase, type Service, type Booking, type Testimonial, type Astrologer, type Video, type CarouselItem } from '@/lib/supabase';
+import { supabase, type Service, type Booking, type Testimonial, type Astrologer, type Video, type CarouselItem, type GalleryImage } from '@/lib/supabase';
 import { useLanguage } from '@/lib/contexts/LanguageContext';
 import { useAdminAuth } from '@/lib/contexts/AdminAuthContext';
 
@@ -17,10 +17,13 @@ export default function AdminDashboard() {
   const [astrologers, setAstrologers] = useState<Astrologer[]>([]);
   const [videos, setVideos] = useState<Video[]>([]);
   const [carouselItems, setCarouselItems] = useState<CarouselItem[]>([]);
+  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
+  const [testimonialFilter, setTestimonialFilter] = useState('all');
   const [loading, setLoading] = useState(false);
   const [showAddServiceModal, setShowAddServiceModal] = useState(false);
   const [showEditServiceModal, setShowEditServiceModal] = useState(false);
   const [editingService, setEditingService] = useState<Service | null>(null);
+  const [showAddGalleryModal, setShowAddGalleryModal] = useState(false);
   const [showAddAstrologerModal, setShowAddAstrologerModal] = useState(false);
   const [showAddVideoModal, setShowAddVideoModal] = useState(false);
   const [showAddCarouselModal, setShowAddCarouselModal] = useState(false);
@@ -73,6 +76,17 @@ export default function AdminDashboard() {
     sort_order: 0,
   });
 
+  const [newGalleryImage, setNewGalleryImage] = useState({
+    title_en: '',
+    title_hi: '',
+    description_en: '',
+    description_hi: '',
+    image_url: '',
+    category: 'general',
+    sort_order: 0,
+    is_active: true,
+  });
+
   // Fetch all data based on active tab
   useEffect(() => {
     const tabFetchMap: { [key: string]: () => Promise<void> } = {
@@ -82,6 +96,7 @@ export default function AdminDashboard() {
       astrologers: fetchAstrologers,
       videos: fetchVideos,
       carousel: fetchCarouselItems,
+      gallery: fetchGalleryImages,
       overview: fetchAllData,
     };
 
@@ -198,6 +213,29 @@ export default function AdminDashboard() {
       setLoading(false);
     }
   };
+
+  const fetchGalleryImages = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('gallery_images')
+        .select('*')
+        .order('sort_order', { ascending: true });
+
+      if (error) throw error;
+      setGalleryImages(data || []);
+    } catch (error) {
+      console.error('Error fetching gallery images:', error);
+      setErrorMessage('Failed to fetch gallery images');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Filter testimonials based on status
+  const filteredTestimonials = testimonialFilter === 'all' 
+    ? testimonials 
+    : testimonials.filter(t => t.status === testimonialFilter);
 
   const handleAddService = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -526,6 +564,38 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleAddGalleryImage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('gallery_images')
+        .insert([newGalleryImage]);
+
+      if (error) throw error;
+      setSuccessMessage('Gallery image added successfully!');
+      setShowAddGalleryModal(false);
+      setNewGalleryImage({
+        title_en: '',
+        title_hi: '',
+        description_en: '',
+        description_hi: '',
+        image_url: '',
+        category: 'general',
+        sort_order: 0,
+        is_active: true,
+      });
+      await fetchGalleryImages();
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (error) {
+      console.error('Error adding gallery image:', error);
+      setErrorMessage('Failed to add gallery image');
+      setTimeout(() => setErrorMessage(''), 3000);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleDeleteCarouselItem = async (id: string) => {
     if (!window.confirm('Are you sure you want to delete this carousel item?')) return;
 
@@ -591,6 +661,158 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleUpdateGallerySortOrder = async (id: string, sortOrder: number) => {
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('gallery_images')
+        .update({ sort_order: sortOrder })
+        .eq('id', id);
+
+      if (error) throw error;
+      setSuccessMessage('Sort order updated!');
+      await fetchGalleryImages();
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (error) {
+      console.error('Error updating gallery sort order:', error);
+      setErrorMessage('Failed to update sort order');
+      setTimeout(() => setErrorMessage(''), 3000);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleToggleGalleryImageStatus = async (id: string, currentStatus: boolean) => {
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('gallery_images')
+        .update({ is_active: !currentStatus })
+        .eq('id', id);
+
+      if (error) throw error;
+      setSuccessMessage('Gallery image status updated!');
+      await fetchGalleryImages();
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (error) {
+      console.error('Error updating gallery image status:', error);
+      setErrorMessage('Failed to update gallery image status');
+      setTimeout(() => setErrorMessage(''), 3000);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteGalleryImage = async (id: string) => {
+    if (!window.confirm('Are you sure you want to delete this gallery image?')) return;
+
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('gallery_images')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      setSuccessMessage('Gallery image deleted successfully!');
+      await fetchGalleryImages();
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (error) {
+      console.error('Error deleting gallery image:', error);
+      setErrorMessage('Failed to delete gallery image');
+      setTimeout(() => setErrorMessage(''), 3000);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Testimonial Management Functions
+  const handleApproveTestimonial = async (id: string) => {
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('testimonials')
+        .update({ status: 'approved', verified: true })
+        .eq('id', id);
+
+      if (error) throw error;
+      setSuccessMessage('Testimonial approved successfully!');
+      await fetchTestimonials();
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (error) {
+      console.error('Error approving testimonial:', error);
+      setErrorMessage('Failed to approve testimonial');
+      setTimeout(() => setErrorMessage(''), 3000);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRejectTestimonial = async (id: string) => {
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('testimonials')
+        .update({ status: 'rejected' })
+        .eq('id', id);
+
+      if (error) throw error;
+      setSuccessMessage('Testimonial rejected!');
+      await fetchTestimonials();
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (error) {
+      console.error('Error rejecting testimonial:', error);
+      setErrorMessage('Failed to reject testimonial');
+      setTimeout(() => setErrorMessage(''), 3000);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleToggleTestimonialFeature = async (id: string, currentFeatured: boolean) => {
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('testimonials')
+        .update({ is_featured: !currentFeatured })
+        .eq('id', id);
+
+      if (error) throw error;
+      setSuccessMessage(`Testimonial ${!currentFeatured ? 'featured' : 'unfeatured'} successfully!`);
+      await fetchTestimonials();
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (error) {
+      console.error('Error toggling testimonial feature:', error);
+      setErrorMessage('Failed to update testimonial feature status');
+      setTimeout(() => setErrorMessage(''), 3000);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteTestimonial = async (id: string) => {
+    if (!window.confirm('Are you sure you want to delete this testimonial?')) return;
+
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('testimonials')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      setSuccessMessage('Testimonial deleted successfully!');
+      await fetchTestimonials();
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (error) {
+      console.error('Error deleting testimonial:', error);
+      setErrorMessage('Failed to delete testimonial');
+      setTimeout(() => setErrorMessage(''), 3000);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Fetch all data for overview
   const fetchAllData = async () => {
     setLoading(true);
@@ -611,6 +833,7 @@ export default function AdminDashboard() {
     { id: 'astrologers', label: t('Astrologers', 'ज्योतिषी'), icon: FiUser, color: 'from-pink-500 to-rose-600' },
     { id: 'videos', label: t('Videos', 'वीडियो'), icon: FiVideo, color: 'from-red-500 to-pink-600' },
     { id: 'carousel', label: t('Carousel', 'कैरोसेल'), icon: FiImage, color: 'from-teal-500 to-cyan-600' },
+    { id: 'gallery', label: t('Gallery', 'गैलरी'), icon: FiImage, color: 'from-indigo-500 to-purple-600' },
   ];
 
   return (
@@ -1033,15 +1256,169 @@ export default function AdminDashboard() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
                   >
-                    <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-6">
-                      {t('Manage Testimonials', 'प्रशंसापत्र प्रबंधित करें')}
-                    </h2>
-                    <div className="text-center py-16">
-                      <FiStar className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                      <p className="text-gray-600 dark:text-gray-400 text-lg">
-                        {t('Testimonial management coming soon', 'प्रशंसापत्र प्रबंधन जल्द आ रहा है')}
-                      </p>
+                    <div className="flex justify-between items-center mb-6">
+                      <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+                        {t('Manage Testimonials', 'प्रशंसापत्र प्रबंधित करें')}
+                      </h2>
+                      <div className="flex space-x-3">
+                        <select
+                          value={testimonialFilter}
+                          onChange={(e) => setTestimonialFilter(e.target.value)}
+                          className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-yellow-500"
+                        >
+                          <option value="all">{t('All Status', 'सभी स्थिति')}</option>
+                          <option value="pending">{t('Pending', 'लंबित')}</option>
+                          <option value="approved">{t('Approved', 'अनुमोदित')}</option>
+                          <option value="rejected">{t('Rejected', 'अस्वीकृत')}</option>
+                        </select>
+                      </div>
                     </div>
+
+                    {loading ? (
+                      <div className="flex items-center justify-center py-20">
+                        <div className="relative">
+                          <div className="w-16 h-16 border-4 border-yellow-200 dark:border-yellow-800 rounded-full"></div>
+                          <div className="w-16 h-16 border-4 border-yellow-600 border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
+                        </div>
+                      </div>
+                    ) : filteredTestimonials.length === 0 ? (
+                      <div className="text-center py-16">
+                        <FiStar className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+                        <p className="text-gray-600 dark:text-gray-400 text-lg">
+                          {t('No testimonials found', 'कोई प्रशंसापत्र नहीं मिला')}
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-6">
+                        {filteredTestimonials.map((testimonial, index) => (
+                          <motion.div
+                            key={testimonial.id}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.05 }}
+                            className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-700 dark:to-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border border-gray-200 dark:border-gray-600"
+                          >
+                            <div className="flex flex-col md:flex-row md:items-start gap-6">
+                              {/* Avatar and Basic Info */}
+                              <div className="flex-shrink-0">
+                                <div className="relative">
+                                  {testimonial.customer_photo ? (
+                                    <img 
+                                      src={testimonial.customer_photo} 
+                                      alt={testimonial.customer_name} 
+                                      className="w-16 h-16 rounded-full object-cover border-2 border-yellow-400"
+                                    />
+                                  ) : (
+                                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-white font-bold text-xl border-2 border-yellow-300">
+                                      {testimonial.customer_name.charAt(0).toUpperCase()}
+                                    </div>
+                                  )}
+                                  <div className="absolute -bottom-1 -right-1 flex">
+                                    {[...Array(testimonial.rating)].map((_, i) => (
+                                      <FiStar key={i} className="w-4 h-4 text-yellow-400 fill-current" />
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Content */}
+                              <div className="flex-1 min-w-0">
+                                <div className="flex flex-wrap items-center gap-3 mb-3">
+                                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                                    {testimonial.customer_name}
+                                  </h3>
+                                  <span className={`px-3 py-1 text-xs font-medium rounded-full ${{
+                                    pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
+                                    approved: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+                                    rejected: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
+                                  }[testimonial.status] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'}`}>
+                                    {t(testimonial.status.charAt(0).toUpperCase() + testimonial.status.slice(1), testimonial.status === 'pending' ? 'लंबित' : testimonial.status === 'approved' ? 'अनुमोदित' : 'अस्वीकृत')}
+                                  </span>
+                                  {testimonial.verified && (
+                                    <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                                      {t('Verified', 'सत्यापित')}
+                                    </span>
+                                  )}
+                                  {testimonial.is_featured && (
+                                    <span className="px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300">
+                                      {t('Featured', 'विशेष रुप से प्रदर्शित')}
+                                    </span>
+                                  )}
+                                </div>
+
+                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                                  <span className="font-medium">{t('Service:', 'सेवा:')}</span> {testimonial.service_used || testimonial.ritual_name}
+                                </p>
+
+                                <p className="text-gray-700 dark:text-gray-300 mb-4 line-clamp-3">
+                                  {language === 'en' ? testimonial.review_en : testimonial.review_hi}
+                                </p>
+
+                                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-gray-500">
+                                  <span>{new Date(testimonial.created_at).toLocaleDateString()}</span>
+                                  {testimonial.email && (
+                                    <span>📧 {testimonial.email}</span>
+                                  )}
+                                  {testimonial.phone && (
+                                    <span>📞 {testimonial.phone}</span>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Actions */}
+                              <div className="flex flex-col space-y-2 min-w-max">
+                                {testimonial.status === 'pending' && (
+                                  <>
+                                    <motion.button
+                                      whileHover={{ scale: 1.05 }}
+                                      whileTap={{ scale: 0.95 }}
+                                      onClick={() => handleApproveTestimonial(testimonial.id)}
+                                      className="flex items-center space-x-2 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-3 py-2 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors text-sm font-medium"
+                                    >
+                                      <FiCheck className="w-4 h-4" />
+                                      <span>{t('Approve', 'अनुमोदित करें')}</span>
+                                    </motion.button>
+                                    <motion.button
+                                      whileHover={{ scale: 1.05 }}
+                                      whileTap={{ scale: 0.95 }}
+                                      onClick={() => handleRejectTestimonial(testimonial.id)}
+                                      className="flex items-center space-x-2 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 px-3 py-2 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors text-sm font-medium"
+                                    >
+                                      <FiX className="w-4 h-4" />
+                                      <span>{t('Reject', 'अस्वीकार करें')}</span>
+                                    </motion.button>
+                                  </>
+                                )}
+                                
+                                <motion.button
+                                  whileHover={{ scale: 1.05 }}
+                                  whileTap={{ scale: 0.95 }}
+                                  onClick={() => handleToggleTestimonialFeature(testimonial.id, testimonial.is_featured)}
+                                  className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors text-sm font-medium ${
+                                    testimonial.is_featured
+                                      ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900/50'
+                                      : 'bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-500'
+                                  }`}
+                                >
+                                  <FiStar className={`w-4 h-4 ${testimonial.is_featured ? 'fill-current' : ''}`} />
+                                  <span>{testimonial.is_featured ? t('Unfeature', 'अनफीचर') : t('Feature', 'फीचर')}</span>
+                                </motion.button>
+
+                                <motion.button
+                                  whileHover={{ scale: 1.05 }}
+                                  whileTap={{ scale: 0.95 }}
+                                  onClick={() => handleDeleteTestimonial(testimonial.id)}
+                                  className="flex items-center space-x-2 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 px-3 py-2 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors text-sm font-medium"
+                                >
+                                  <FiTrash className="w-4 h-4" />
+                                  <span>{t('Delete', 'मिटाएं')}</span>
+                                </motion.button>
+                              </div>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+                    )}
                   </motion.div>
                 )}
 
@@ -1383,6 +1760,128 @@ export default function AdminDashboard() {
                                     </motion.button>
                                   </div>
                                 </div>
+                              </div>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+
+                {activeTab === 'gallery' && (
+                  <motion.div
+                    key="gallery"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                  >
+                    <div className="flex justify-between items-center mb-6">
+                      <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+                        {t('Manage Gallery', 'गैलरी प्रबंधित करें')}
+                      </h2>
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => setShowAddGalleryModal(true)}
+                        className="flex items-center space-x-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all"
+                      >
+                        <FiPlus className="w-5 h-5" />
+                        <span className="font-medium">{t('Add Gallery Image', 'गैलरी छवि जोड़ें')}</span>
+                      </motion.button>
+                    </div>
+
+                    {loading ? (
+                      <div className="flex items-center justify-center py-20">
+                        <div className="relative">
+                          <div className="w-16 h-16 border-4 border-indigo-200 dark:border-indigo-800 rounded-full"></div>
+                          <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
+                        </div>
+                      </div>
+                    ) : galleryImages.length === 0 ? (
+                      <div className="text-center py-16">
+                        <FiImage className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+                        <p className="text-gray-600 dark:text-gray-400 text-lg">
+                          {t('No gallery images found. Add one to get started!', 'कोई गैलरी छवि नहीं मिली। शुरू करने के लिए एक जोड़ें!')}
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                        {galleryImages.map((image, index) => (
+                          <motion.div
+                            key={image.id}
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: index * 0.05 }}
+                            className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-700 dark:to-gray-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all border border-gray-200 dark:border-gray-600"
+                          >
+                            <div className="relative h-48">
+                              {image.image_url ? (
+                                <img src={image.image_url} alt={image.title_en} className="w-full h-full object-cover" />
+                              ) : (
+                                <div className="w-full h-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                                  <FiImage className="w-16 h-16 text-white/50" />
+                                </div>
+                              )}
+                              <span className={`absolute top-4 right-4 px-2 py-1 text-xs font-medium rounded-full ${
+                                image.is_active
+                                  ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+                                  : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
+                              }`}>
+                                {image.is_active ? t('Active', 'सक्रिय') : t('Inactive', 'निष्क्रिय')}
+                              </span>
+                            </div>
+                            <div className="p-6">
+                              <div className="flex items-start justify-between mb-3">
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-white line-clamp-2">
+                                  {language === 'en' ? image.title_en : image.title_hi}
+                                </h3>
+                                <span className="px-2 py-1 text-xs font-medium rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300 ml-2">
+                                  {image.category}
+                                </span>
+                              </div>
+                              <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">
+                                {language === 'en' ? image.description_en : image.description_hi}
+                              </p>
+                              <div className="flex items-center space-x-2 mb-4">
+                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                  {t('Sort Order', 'क्रम')}:
+                                </label>
+                                <input
+                                  type="number"
+                                  value={image.sort_order}
+                                  onChange={(e) => handleUpdateGallerySortOrder(image.id, parseInt(e.target.value) || 0)}
+                                  className="w-16 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded text-center dark:bg-gray-700 dark:text-white"
+                                  min="0"
+                                />
+                              </div>
+                              <div className="flex space-x-2">
+                                <motion.button
+                                  whileHover={{ scale: 1.05 }}
+                                  whileTap={{ scale: 0.95 }}
+                                  className="flex-1 flex items-center justify-center space-x-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 py-2 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors text-sm font-medium"
+                                >
+                                  <FiEdit className="w-4 h-4" />
+                                  <span>{t('Edit', 'संपादित करें')}</span>
+                                </motion.button>
+                                <motion.button
+                                  whileHover={{ scale: 1.05 }}
+                                  whileTap={{ scale: 0.95 }}
+                                  onClick={() => handleToggleGalleryImageStatus(image.id, image.is_active)}
+                                  className="flex-1 flex items-center justify-center space-x-1 bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors text-sm font-medium"
+                                >
+                                  <FiSliders className="w-4 h-4" />
+                                  <span>{t('Toggle', 'टॉगल')}</span>
+                                </motion.button>
+                                <motion.button
+                                  whileHover={{ scale: 1.05 }}
+                                  whileTap={{ scale: 0.95 }}
+                                  onClick={() => handleDeleteGalleryImage(image.id)}
+                                  className="flex-1 flex items-center justify-center space-x-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 py-2 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors text-sm font-medium"
+                                >
+                                  <FiTrash className="w-4 h-4" />
+                                  <span>{t('Delete', 'मिटाएं')}</span>
+                                </motion.button>
                               </div>
                             </div>
                           </motion.div>
@@ -1802,6 +2301,111 @@ export default function AdminDashboard() {
                   className="w-full bg-gradient-to-r from-teal-500 to-cyan-600 text-white py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? t('Adding...', 'जोड़ रहे हैं...') : t('Add Carousel Item', 'कैरोसेल आइटम जोड़ें')}
+                </motion.button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+
+        {/* Add Gallery Image Modal */}
+        {showAddGalleryModal && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="bg-white dark:bg-gray-800 rounded-3xl p-8 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+            >
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                  {t('Add Gallery Image', 'गैलरी छवि जोड़ें')}
+                </h3>
+                <button
+                  onClick={() => setShowAddGalleryModal(false)}
+                  className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+                  title={t('Close', 'बंद करें')}
+                >
+                  <FiX className="w-6 h-6" />
+                </button>
+              </div>
+
+              <form onSubmit={handleAddGalleryImage} className="space-y-4">
+                <input
+                  type="text"
+                  placeholder={t('Title (English)', 'शीर्षक (अंग्रेजी)')}
+                  value={newGalleryImage.title_en}
+                  onChange={(e) => setNewGalleryImage({ ...newGalleryImage, title_en: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder={t('Title (Hindi)', 'शीर्षक (हिंदी)')}
+                  value={newGalleryImage.title_hi}
+                  onChange={(e) => setNewGalleryImage({ ...newGalleryImage, title_hi: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  required
+                />
+                <textarea
+                  placeholder={t('Description (English)', 'विवरण (अंग्रेजी)')}
+                  value={newGalleryImage.description_en}
+                  onChange={(e) => setNewGalleryImage({ ...newGalleryImage, description_en: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all h-20 resize-none"
+                />
+                <textarea
+                  placeholder={t('Description (Hindi)', 'विवरण (हिंदी)')}
+                  value={newGalleryImage.description_hi}
+                  onChange={(e) => setNewGalleryImage({ ...newGalleryImage, description_hi: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all h-20 resize-none"
+                />
+                <input
+                  type="url"
+                  placeholder={t('Image URL', 'छवि URL')}
+                  value={newGalleryImage.image_url}
+                  onChange={(e) => setNewGalleryImage({ ...newGalleryImage, image_url: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  required
+                />
+                <select
+                  value={newGalleryImage.category}
+                  onChange={(e) => setNewGalleryImage({ ...newGalleryImage, category: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                >
+                  <option value="general">{t('General', 'सामान्य')}</option>
+                  <option value="ceremony">{t('Ceremony', 'समारोह')}</option>
+                  <option value="havan">{t('Havan', 'हवन')}</option>
+                  <option value="wedding">{t('Wedding', 'विवाह')}</option>
+                  <option value="puja">{t('Puja', 'पूजा')}</option>
+                  <option value="katha">{t('Katha', 'कथा')}</option>
+                </select>
+                <input
+                  type="number"
+                  placeholder={t('Sort Order', 'क्रम')}
+                  value={newGalleryImage.sort_order}
+                  onChange={(e) => setNewGalleryImage({ ...newGalleryImage, sort_order: parseInt(e.target.value) || 0 })}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  min="0"
+                />
+                <div className="flex items-center space-x-3 px-4 py-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl border-2 border-indigo-200 dark:border-indigo-800">
+                  <input
+                    type="checkbox"
+                    id="gallery-active"
+                    checked={newGalleryImage.is_active}
+                    onChange={(e) => setNewGalleryImage({ ...newGalleryImage, is_active: e.target.checked })}
+                    className="w-5 h-5 rounded text-indigo-500 focus:ring-indigo-500"
+                  />
+                  <label htmlFor="gallery-active" className="text-gray-700 dark:text-gray-300 font-medium cursor-pointer">
+                    {t('Active Image', 'सक्रिय छवि')}
+                  </label>
+                </div>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? t('Adding...', 'जोड़ रहे हैं...') : t('Add Gallery Image', 'गैलरी छवि जोड़ें')}
                 </motion.button>
               </form>
             </motion.div>

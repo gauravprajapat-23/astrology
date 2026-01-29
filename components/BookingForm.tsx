@@ -41,9 +41,21 @@ export default function BookingForm() {
     const selectedService = localStorage.getItem('selectedService');
     if (selectedService) {
       setBookingData(prev => ({ ...prev, serviceId: selectedService }));
-      localStorage.removeItem('selectedService');
+      // Remove the item after a short delay to allow for potential page refreshes
+      setTimeout(() => {
+        localStorage.removeItem('selectedService');
+      }, 1000);
+      
+      // Auto advance to next step if service is pre-selected
+      if (selectedService && step === 1) {
+        setTimeout(() => {
+          if (validateStep(1)) {
+            setStep(2);
+          }
+        }, 500);
+      }
     }
-  }, []);
+  }, [step]);
 
   const fetchServices = async () => {
     const { data } = await supabase.from('services').select('*').eq('is_active', true);
@@ -315,6 +327,16 @@ export default function BookingForm() {
                   <p className="text-gray-600 dark:text-gray-400 ml-10">
                     {t('Choose the sacred ritual you wish to book', 'वह पवित्र अनुष्ठान चुनें जिसे आप बुक करना चाहते हैं')}
                   </p>
+                  {bookingData.serviceId && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mt-3 ml-10 flex items-center text-sm text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-3 py-2 rounded-lg"
+                    >
+                      <FiCheck className="w-4 h-4 mr-2" />
+                      <span>{t('Service pre-selected from services page', 'सेवाएं पृष्ठ से पूर्व-चयनित सेवा')}</span>
+                    </motion.div>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
@@ -348,7 +370,9 @@ export default function BookingForm() {
                       {bookingData.serviceId === service.id && (
                         <motion.div
                           layoutId="selectedService"
-                          className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center shadow-lg"
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center shadow-lg ring-2 ring-white dark:ring-gray-800"
                         >
                           <FiCheck className="w-5 h-5 text-white" strokeWidth={3} />
                         </motion.div>
