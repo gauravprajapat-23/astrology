@@ -19,6 +19,8 @@ export default function AdminDashboard() {
   const [carouselItems, setCarouselItems] = useState<CarouselItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [showAddServiceModal, setShowAddServiceModal] = useState(false);
+  const [showEditServiceModal, setShowEditServiceModal] = useState(false);
+  const [editingService, setEditingService] = useState<Service | null>(null);
   const [showAddAstrologerModal, setShowAddAstrologerModal] = useState(false);
   const [showAddVideoModal, setShowAddVideoModal] = useState(false);
   const [showAddCarouselModal, setShowAddCarouselModal] = useState(false);
@@ -232,6 +234,66 @@ export default function AdminDashboard() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEditService = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingService) return;
+    
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('services')
+        .update({
+          name_en: newService.name_en,
+          name_hi: newService.name_hi,
+          description_en: newService.description_en,
+          description_hi: newService.description_hi,
+          category: newService.category,
+          base_price: newService.base_price,
+          duration_minutes: newService.duration_minutes,
+          is_active: newService.is_active,
+        })
+        .eq('id', editingService.id);
+
+      if (error) throw error;
+      setSuccessMessage('Service updated successfully!');
+      setShowEditServiceModal(false);
+      setEditingService(null);
+      setNewService({
+        name_en: '',
+        name_hi: '',
+        description_en: '',
+        description_hi: '',
+        category: 'Rituals',
+        base_price: 0,
+        duration_minutes: 60,
+        is_active: true,
+      });
+      await fetchServices();
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (error) {
+      console.error('Error updating service:', error);
+      setErrorMessage('Failed to update service');
+      setTimeout(() => setErrorMessage(''), 3000);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const openEditServiceModal = (service: Service) => {
+    setEditingService(service);
+    setNewService({
+      name_en: service.name_en,
+      name_hi: service.name_hi,
+      description_en: service.description_en || '',
+      description_hi: service.description_hi || '',
+      category: service.category,
+      base_price: service.base_price,
+      duration_minutes: service.duration_minutes,
+      is_active: service.is_active,
+    });
+    setShowEditServiceModal(true);
   };
 
   const handleDeleteService = async (id: string) => {
@@ -804,20 +866,29 @@ export default function AdminDashboard() {
                                     <motion.button
                                       whileHover={{ scale: 1.1 }}
                                       whileTap={{ scale: 0.9 }}
+                                      onClick={() => openEditServiceModal(service)}
+                                      className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 p-2 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30"
+                                      title={t('Edit', 'संपादित करें')}
+                                    >
+                                      <FiEdit className="w-4 h-4" />
+                                    </motion.button>
+                                    <motion.button
+                                      whileHover={{ scale: 1.1 }}
+                                      whileTap={{ scale: 0.9 }}
                                       onClick={() => handleToggleServiceStatus(service.id, service.is_active)}
-                                      className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                                      className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 p-2 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30"
                                       title={t('Toggle Status', 'स्थिति टॉगल करें')}
                                     >
-                                      <FiSliders className="w-5 h-5" />
+                                      <FiSliders className="w-4 h-4" />
                                     </motion.button>
                                     <motion.button
                                       whileHover={{ scale: 1.1 }}
                                       whileTap={{ scale: 0.9 }}
                                       onClick={() => handleDeleteService(service.id)}
-                                      className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                                      className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 p-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30"
                                       title={t('Delete', 'मिटाएं')}
                                     >
-                                      <FiTrash className="w-5 h-5" />
+                                      <FiTrash className="w-4 h-4" />
                                     </motion.button>
                                   </div>
                                 </td>
@@ -837,15 +908,121 @@ export default function AdminDashboard() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
                   >
-                    <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-6">
-                      {t('Manage Bookings', 'बुकिंग प्रबंधित करें')}
-                    </h2>
-                    <div className="text-center py-16">
-                      <FiCalendar className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                      <p className="text-gray-600 dark:text-gray-400 text-lg">
-                        {t('Booking management coming soon', 'बुकिंग प्रबंधन जल्द आ रहा है')}
-                      </p>
+                    <div className="flex justify-between items-center mb-6">
+                      <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+                        {t('Manage Bookings', 'बुकिंग प्रबंधित करें')}
+                      </h2>
+                      <div className="flex space-x-3">
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          className="flex items-center space-x-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all"
+                        >
+                          <FiCalendar className="w-4 h-4" />
+                          <span className="font-medium">{t('Add Booking', 'बुकिंग जोड़ें')}</span>
+                        </motion.button>
+                      </div>
                     </div>
+
+                    {loading ? (
+                      <div className="flex items-center justify-center py-20">
+                        <div className="relative">
+                          <div className="w-16 h-16 border-4 border-green-200 dark:border-green-800 rounded-full"></div>
+                          <div className="w-16 h-16 border-4 border-green-600 border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
+                        </div>
+                      </div>
+                    ) : bookings.length === 0 ? (
+                      <div className="text-center py-16">
+                        <FiCalendar className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+                        <p className="text-gray-600 dark:text-gray-400 text-lg">
+                          {t('No bookings found. Add one to get started!', 'कोई बुकिंग नहीं मिली। शुरू करने के लिए एक जोड़ें!')}
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="overflow-x-auto rounded-2xl border border-gray-200 dark:border-gray-700">
+                        <table className="w-full">
+                          <thead className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700">
+                            <tr>
+                              <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">{t('Customer', 'ग्राहक')}</th>
+                              <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">{t('Service', 'सेवा')}</th>
+                              <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">{t('Date', 'तिथि')}</th>
+                              <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">{t('Time', 'समय')}</th>
+                              <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">{t('Status', 'स्थिति')}</th>
+                              <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">{t('Amount', 'राशि')}</th>
+                              <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">{t('Actions', 'क्रियाएं')}</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                            {bookings.map((booking, index) => (
+                              <motion.tr
+                                key={booking.id}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: index * 0.05 }}
+                                className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                              >
+                                <td className="px-6 py-4">
+                                  <div>
+                                    <div className="font-medium text-gray-900 dark:text-white">{booking.customer_name}</div>
+                                    <div className="text-sm text-gray-500 dark:text-gray-400">{booking.customer_email}</div>
+                                  </div>
+                                </td>
+                                <td className="px-6 py-4 text-gray-900 dark:text-white">
+                                  {services.find(s => s.id === booking.service_id)?.name_en || 'Unknown Service'}
+                                </td>
+                                <td className="px-6 py-4 text-gray-600 dark:text-gray-400">
+                                  {new Date(booking.preferred_date).toLocaleDateString('en-IN')}
+                                </td>
+                                <td className="px-6 py-4 text-gray-600 dark:text-gray-400">
+                                  {booking.preferred_time}
+                                </td>
+                                <td className="px-6 py-4">
+                                  <span className={`px-3 py-1 text-xs font-medium rounded-full ${{
+                                    'pending': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
+                                    'confirmed': 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+                                    'completed': 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+                                    'cancelled': 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
+                                  }[booking.status] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'}`}>
+                                    {t(booking.status.charAt(0).toUpperCase() + booking.status.slice(1), booking.status === 'pending' ? 'लंबित' : booking.status === 'confirmed' ? 'पुष्टि' : booking.status === 'completed' ? 'पूर्ण' : 'रद्द')}
+                                  </span>
+                                </td>
+                                <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
+                                  ₹{booking.total_amount.toLocaleString()}
+                                </td>
+                                <td className="px-6 py-4">
+                                  <div className="flex space-x-2">
+                                    <motion.button
+                                      whileHover={{ scale: 1.1 }}
+                                      whileTap={{ scale: 0.9 }}
+                                      className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 p-2 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30"
+                                      title={t('Edit Booking', 'बुकिंग संपादित करें')}
+                                    >
+                                      <FiEdit className="w-4 h-4" />
+                                    </motion.button>
+                                    <motion.button
+                                      whileHover={{ scale: 1.1 }}
+                                      whileTap={{ scale: 0.9 }}
+                                      className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 p-2 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30"
+                                      title={t('Confirm Booking', 'बुकिंग पुष्टि करें')}
+                                    >
+                                      <FiCheck className="w-4 h-4" />
+                                    </motion.button>
+                                    <motion.button
+                                      whileHover={{ scale: 1.1 }}
+                                      whileTap={{ scale: 0.9 }}
+                                      className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 p-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30"
+                                      title={t('Cancel Booking', 'बुकिंग रद्द करें')}
+                                    >
+                                      <FiX className="w-4 h-4" />
+                                    </motion.button>
+                                  </div>
+                                </td>
+                              </motion.tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
                   </motion.div>
                 )}
 
@@ -1219,7 +1396,220 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Modals remain the same as original code... */}
+        {/* Add Service Modal */}
+        {showAddServiceModal && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="bg-white dark:bg-gray-800 rounded-3xl p-8 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+            >
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+                  {t('Add Service', 'सेवा जोड़ें')}
+                </h3>
+                <button
+                  onClick={() => setShowAddServiceModal(false)}
+                  className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+                  title={t('Close', 'बंद करें')}
+                >
+                  <FiX className="w-6 h-6" />
+                </button>
+              </div>
+
+              <form onSubmit={handleAddService} className="space-y-4">
+                <input
+                  type="text"
+                  placeholder={t('Service Name (English)', 'सेवा का नाम (अंग्रेजी)')}
+                  value={newService.name_en}
+                  onChange={(e) => setNewService({ ...newService, name_en: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder={t('Service Name (Hindi)', 'सेवा का नाम (हिंदी)')}
+                  value={newService.name_hi}
+                  onChange={(e) => setNewService({ ...newService, name_hi: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  required
+                />
+                <textarea
+                  placeholder={t('Description (English)', 'विवरण (अंग्रेजी)')}
+                  value={newService.description_en}
+                  onChange={(e) => setNewService({ ...newService, description_en: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all h-20 resize-none"
+                />
+                <textarea
+                  placeholder={t('Description (Hindi)', 'विवरण (हिंदी)')}
+                  value={newService.description_hi}
+                  onChange={(e) => setNewService({ ...newService, description_hi: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all h-20 resize-none"
+                />
+                <select
+                  value={newService.category}
+                  onChange={(e) => setNewService({ ...newService, category: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                >
+                  <option value="Rituals">{t('Rituals', 'अनुष्ठान')}</option>
+                  <option value="Havan">{t('Havan', 'हवन')}</option>
+                  <option value="Pooja">{t('Pooja', 'पूजा')}</option>
+                  <option value="Consultation">{t('Consultation', 'परामर्श')}</option>
+                  <option value="Astrology">{t('Astrology', 'ज्योतिष')}</option>
+                </select>
+                <input
+                  type="number"
+                  placeholder={t('Base Price (₹)', 'मूल मूल्य (₹)')}
+                  value={newService.base_price}
+                  onChange={(e) => setNewService({ ...newService, base_price: parseInt(e.target.value) || 0 })}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  min="0"
+                  required
+                />
+                <input
+                  type="number"
+                  placeholder={t('Duration (minutes)', 'अवधि (मिनट)')}
+                  value={newService.duration_minutes}
+                  onChange={(e) => setNewService({ ...newService, duration_minutes: parseInt(e.target.value) || 60 })}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  min="15"
+                  required
+                />
+                <div className="flex items-center space-x-3 px-4 py-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl border-2 border-blue-200 dark:border-blue-800">
+                  <input
+                    type="checkbox"
+                    id="service-active"
+                    checked={newService.is_active}
+                    onChange={(e) => setNewService({ ...newService, is_active: e.target.checked })}
+                    className="w-5 h-5 rounded text-blue-500 focus:ring-blue-500"
+                  />
+                  <label htmlFor="service-active" className="text-gray-700 dark:text-gray-300 font-medium cursor-pointer">
+                    {t('Active Service', 'सक्रिय सेवा')}
+                  </label>
+                </div>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-gradient-to-r from-blue-500 to-cyan-600 text-white py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? t('Adding...', 'जोड़ रहे हैं...') : t('Add Service', 'सेवा जोड़ें')}
+                </motion.button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+
+        {/* Edit Service Modal */}
+        {showEditServiceModal && editingService && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="bg-white dark:bg-gray-800 rounded-3xl p-8 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+            >
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                  {t('Edit Service', 'सेवा संपादित करें')}
+                </h3>
+                <button
+                  onClick={() => {
+                    setShowEditServiceModal(false);
+                    setEditingService(null);
+                  }}
+                  className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+                  title={t('Close', 'बंद करें')}
+                >
+                  <FiX className="w-6 h-6" />
+                </button>
+              </div>
+
+              <form onSubmit={handleEditService} className="space-y-4">
+                <input
+                  type="text"
+                  placeholder={t('Service Name (English)', 'सेवा का नाम (अंग्रेजी)')}
+                  value={newService.name_en}
+                  onChange={(e) => setNewService({ ...newService, name_en: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder={t('Service Name (Hindi)', 'सेवा का नाम (हिंदी)')}
+                  value={newService.name_hi}
+                  onChange={(e) => setNewService({ ...newService, name_hi: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                  required
+                />
+                <textarea
+                  placeholder={t('Description (English)', 'विवरण (अंग्रेजी)')}
+                  value={newService.description_en}
+                  onChange={(e) => setNewService({ ...newService, description_en: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all h-20 resize-none"
+                />
+                <textarea
+                  placeholder={t('Description (Hindi)', 'विवरण (हिंदी)')}
+                  value={newService.description_hi}
+                  onChange={(e) => setNewService({ ...newService, description_hi: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all h-20 resize-none"
+                />
+                <select
+                  value={newService.category}
+                  onChange={(e) => setNewService({ ...newService, category: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                >
+                  <option value="Rituals">{t('Rituals', 'अनुष्ठान')}</option>
+                  <option value="Havan">{t('Havan', 'हवन')}</option>
+                  <option value="Pooja">{t('Pooja', 'पूजा')}</option>
+                  <option value="Consultation">{t('Consultation', 'परामर्श')}</option>
+                  <option value="Astrology">{t('Astrology', 'ज्योतिष')}</option>
+                </select>
+                <input
+                  type="number"
+                  placeholder={t('Base Price (₹)', 'मूल मूल्य (₹)')}
+                  value={newService.base_price}
+                  onChange={(e) => setNewService({ ...newService, base_price: parseInt(e.target.value) || 0 })}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                  min="0"
+                  required
+                />
+                <input
+                  type="number"
+                  placeholder={t('Duration (minutes)', 'अवधि (मिनट)')}
+                  value={newService.duration_minutes}
+                  onChange={(e) => setNewService({ ...newService, duration_minutes: parseInt(e.target.value) || 60 })}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                  min="15"
+                  required
+                />
+                <div className="flex items-center space-x-3 px-4 py-3 bg-green-50 dark:bg-green-900/20 rounded-xl border-2 border-green-200 dark:border-green-800">
+                  <input
+                    type="checkbox"
+                    id="edit-service-active"
+                    checked={newService.is_active}
+                    onChange={(e) => setNewService({ ...newService, is_active: e.target.checked })}
+                    className="w-5 h-5 rounded text-green-500 focus:ring-green-500"
+                  />
+                  <label htmlFor="edit-service-active" className="text-gray-700 dark:text-gray-300 font-medium cursor-pointer">
+                    {t('Active Service', 'सक्रिय सेवा')}
+                  </label>
+                </div>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? t('Updating...', 'अपडेट कर रहे हैं...') : t('Update Service', 'सेवा अपडेट करें')}
+                </motion.button>
+              </form>
+            </motion.div>
+          </div>
+        )}
         {/* Add Video Modal */}
         {showAddVideoModal && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
