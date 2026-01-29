@@ -12,20 +12,20 @@ export default function Footer() {
 
   return (
     <footer className="bg-gray-900 text-gray-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 md:py-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 mb-6 sm:mb-8">
           <div>
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-saffron-500 to-gold-500 rounded-full flex items-center justify-center">
-                <span className="text-white text-xl">ॐ</span>
+            <div className="flex items-center space-x-2 sm:space-x-3 mb-3 sm:mb-4">
+              <div className="w-8 sm:w-10 h-8 sm:h-10 bg-gradient-to-br from-saffron-500 to-gold-500 rounded-full flex items-center justify-center">
+                <span className="text-white text-lg sm:text-xl">ॐ</span>
               </div>
               <div>
-                <h3 className="text-xl font-heading font-bold text-white">
+                <h3 className="text-lg sm:text-xl font-heading font-bold text-white">
                   {t('Divine Rituals', 'दिव्य रिचुअल्स')}
                 </h3>
               </div>
             </div>
-            <p className="text-sm">
+            <p className="text-xs sm:text-sm">
               {t(
                 'Authentic Vedic rituals and astrology services for your spiritual well-being.',
                 'आपकी आध्यात्मिक भलाई के लिए प्रामाणिक वैदिक अनुष्ठान और ज्योतिष सेवाएं।'
@@ -34,10 +34,10 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="text-lg font-semibold text-white mb-4">
+            <h4 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4">
               {t('Quick Links', 'त्वरित लिंक')}
             </h4>
-            <ul className="space-y-2">
+            <ul className="space-y-1.5 sm:space-y-2">
               <li>
                 <button onClick={() => scrollToSection('home')} className="hover:text-saffron-400 transition-colors">
                   {t('Home', 'होम')}
@@ -62,10 +62,10 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="text-lg font-semibold text-white mb-4">
+            <h4 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4">
               {t('Services', 'सेवाएं')}
             </h4>
-            <ul className="space-y-2 text-sm">
+            <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm">
               <li>{t('Graha Shanti Puja', 'ग्रह शांति पूजा')}</li>
               <li>{t('Marriage Muhurat', 'विवाह मुहूर्त')}</li>
               <li>{t('Vastu Consultation', 'वास्तु परामर्श')}</li>
@@ -75,48 +75,48 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="text-lg font-semibold text-white mb-4">
+            <h4 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4">
               {t('Connect With Us', 'हमसे जुड़ें')}
             </h4>
-            <div className="flex space-x-4 mb-4">
+            <div className="flex space-x-3 sm:space-x-4 mb-3 sm:mb-4">
               <a
                 href="https://facebook.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-saffron-500 transition-colors"
+                className="w-8 sm:w-10 h-8 sm:h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-saffron-500 transition-colors"
                 aria-label="Facebook"
               >
-                <FiFacebook className="w-5 h-5" />
+                <FiFacebook className="w-4 sm:w-5 h-4 sm:h-5" />
               </a>
               <a
                 href="https://instagram.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-saffron-500 transition-colors"
+                className="w-8 sm:w-10 h-8 sm:h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-saffron-500 transition-colors"
                 aria-label="Instagram"
               >
-                <FiInstagram className="w-5 h-5" />
+                <FiInstagram className="w-4 sm:w-5 h-4 sm:h-5" />
               </a>
               <a
                 href="https://twitter.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-saffron-500 transition-colors"
+                className="w-8 sm:w-10 h-8 sm:h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-saffron-500 transition-colors"
                 aria-label="Twitter"
               >
-                <FiTwitter className="w-5 h-5" />
+                <FiTwitter className="w-4 sm:w-5 h-4 sm:h-5" />
               </a>
               <a
                 href="https://youtube.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-saffron-500 transition-colors"
+                className="w-8 sm:w-10 h-8 sm:h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-saffron-500 transition-colors"
                 aria-label="YouTube"
               >
-                <FiYoutube className="w-5 h-5" />
+                <FiYoutube className="w-4 sm:w-5 h-4 sm:h-5" />
               </a>
             </div>
-            <p className="text-sm">
+            <p className="text-xs sm:text-sm">
               {t('Email:', 'ईमेल:')} info@divinerituals.com
               <br />
               {t('Phone:', 'फ़ोन:')} +91 98765 43210
@@ -124,17 +124,17 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-gray-800 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <p className="text-sm text-center md:text-left">
+        <div className="border-t border-gray-800 pt-6 sm:pt-8">
+          <div className="flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0">
+            <p className="text-xs sm:text-sm text-center sm:text-left mb-2 sm:mb-0">
               &copy; {new Date().getFullYear()} {t('Divine Rituals. All rights reserved.', 'दिव्य रिचुअल्स। सर्वाधिकार सुरक्षित।')}
             </p>
-            <div className="flex items-center space-x-1 text-sm">
+            <div className="flex items-center space-x-1 text-xs sm:text-sm mb-2 sm:mb-0">
               <span>{t('Made with', 'के साथ बनाया')}</span>
-              <FiHeart className="w-4 h-4 text-red-500 fill-current" />
+              <FiHeart className="w-3.5 sm:w-4 h-3.5 sm:h-4 text-red-500 fill-current" />
               <span>{t('for spiritual seekers', 'आध्यात्मिक साधकों के लिए')}</span>
             </div>
-            <div className="flex space-x-4 text-sm">
+            <div className="flex space-x-3 sm:space-x-4 text-xs sm:text-sm">
               <button className="hover:text-saffron-400 transition-colors">
                 {t('Privacy Policy', 'गोपनीयता नीति')}
               </button>

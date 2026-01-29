@@ -1,8 +1,7 @@
 import { ThemeProvider } from '@/lib/contexts/ThemeContext';
 import { LanguageProvider } from '@/lib/contexts/LanguageContext';
-import Navigation from '@/components/Navigation';
-import AdminDashboard from '@/components/AdminDashboard';
-import Footer from '@/components/Footer';
+import { AdminAuthProvider } from '@/lib/contexts/AdminAuthContext';
+import AdminPageContent from '@/components/AdminPageContent';
 
 export const metadata = {
   title: 'Admin Panel | Vedic Astrology Services',
@@ -13,11 +12,9 @@ export default function AdminPage() {
   return (
     <ThemeProvider>
       <LanguageProvider>
-        <div className="min-h-screen">
-          <Navigation />
-          <AdminDashboard />
-          <Footer />
-        </div>
+        <AdminAuthProvider>
+          <AdminPageContent />
+        </AdminAuthProvider>
       </LanguageProvider>
     </ThemeProvider>
   );

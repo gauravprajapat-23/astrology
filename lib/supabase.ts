@@ -85,3 +85,33 @@ export type Astrologer = {
   is_active: boolean;
   created_at: string;
 };
+
+export type Video = {
+  id: string;
+  title_en: string;
+  title_hi: string;
+  description_en: string;
+  description_hi: string;
+  youtube_url: string;
+  thumbnail_url: string;
+  duration: string;
+  category: string;
+  is_featured: boolean;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type CarouselItem = {
+  id: string;
+  title_en: string;
+  title_hi: string;
+  description_en: string;
+  description_hi: string;
+  image_url: string;
+  link: string;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
