@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
 export async function GET() {
+  // Create Supabase client inside the function to avoid build-time issues
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
   try {
     console.log('Testing site settings fetch...');
     
@@ -17,10 +17,20 @@ export async function GET() {
 
     if (error) {
       console.error('Site settings error:', error);
+      // Check if the error is specifically about the table not existing
+      if (error.message?.includes('does not exist')) {
+        return NextResponse.json({ 
+          success: false, 
+          error: 'Site settings table does not exist. Please run database migrations.',
+          details: error,
+          table_exists: false
+        }, { status: 500 });
+      }
       return NextResponse.json({ 
         success: false, 
         error: error.message,
-        details: error
+        details: error,
+        table_exists: true
       }, { status: 500 });
     }
 
