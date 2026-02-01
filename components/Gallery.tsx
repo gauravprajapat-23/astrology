@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiX, FiChevronLeft, FiChevronRight, FiMaximize2 } from 'react-icons/fi';
 import { supabase, type GalleryImage } from '@/lib/supabase';
@@ -136,12 +137,17 @@ export default function Gallery() {
               onClick={() => openLightbox(image, index)}
             >
               {/* Image */}
-              <img
+              <div className="relative w-full h-full">
+              <Image
                 src={image.image_url}
                 alt={language === 'en' ? image.title_en : image.title_hi}
                 className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
-                loading="lazy"
+                fill
+                sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 25vw"
+                style={{ objectFit: 'cover' }}
+                priority={false}
               />
+            </div>
               
               {/* Gradient Overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
@@ -219,10 +225,13 @@ export default function Gallery() {
               className="relative max-w-6xl w-full"
             >
               {/* Main Image */}
-              <img
+              <Image
                 src={selectedImage.image_url}
                 alt={language === 'en' ? selectedImage.title_en : selectedImage.title_hi}
                 className="w-full h-auto max-h-[85vh] object-contain rounded-2xl shadow-2xl"
+                width={1200}
+                height={800}
+                priority
               />
 
               {/* Image Info */}

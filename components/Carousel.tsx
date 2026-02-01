@@ -30,6 +30,15 @@ export default function Carousel() {
   useEffect(() => {
     fetchCarouselItems();
   }, []);
+  const nextSlide = useCallback(() => {
+    setDirection(1);
+    setCurrentIndex((prev) => (prev + 1) % items.length);
+  }, [items.length]);
+
+  const prevSlide = useCallback(() => {
+    setDirection(-1);
+    setCurrentIndex((prev) => (prev - 1 + items.length) % items.length);
+  }, [items.length]);
 
   useEffect(() => {
     if (!isAutoPlaying || items.length <= 1) return;
@@ -39,7 +48,7 @@ export default function Carousel() {
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [isAutoPlaying, items.length, currentIndex]);
+  }, [isAutoPlaying, items.length, nextSlide]);
 
   const fetchCarouselItems = async () => {
     try {
@@ -58,15 +67,6 @@ export default function Carousel() {
     }
   };
 
-  const nextSlide = useCallback(() => {
-    setDirection(1);
-    setCurrentIndex((prev) => (prev + 1) % items.length);
-  }, [items.length]);
-
-  const prevSlide = useCallback(() => {
-    setDirection(-1);
-    setCurrentIndex((prev) => (prev - 1 + items.length) % items.length);
-  }, [items.length]);
 
   const goToSlide = useCallback((index: number) => {
     setDirection(index > currentIndex ? 1 : -1);

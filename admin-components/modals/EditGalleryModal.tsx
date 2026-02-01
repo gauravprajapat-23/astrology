@@ -21,8 +21,6 @@ export default function EditGalleryModal({ image, onClose, onSuccess, onError }:
     description_en: image.description_en || '',
     description_hi: image.description_hi || '',
     image_url: image.image_url,
-    alt_text_en: image?.alt_text_en || '',
-    alt_text_hi: image?.alt_text_hi || '',
     category: image.category,
     is_active: image.is_active,
   });
@@ -70,8 +68,6 @@ export default function EditGalleryModal({ image, onClose, onSuccess, onError }:
           description_en: formData.description_en,
           description_hi: formData.description_hi,
           image_url: formData.image_url,
-          alt_text_en: formData.alt_text_en,
-          alt_text_hi: formData.alt_text_hi,
           category: formData.category,
           is_active: formData.is_active,
           updated_at: new Date().toISOString(),
@@ -145,23 +141,7 @@ export default function EditGalleryModal({ image, onClose, onSuccess, onError }:
             />
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input
-              type="text"
-              placeholder={t('Alt Text (English)', 'Alt Text (अंग्रेजी)')}
-              value={formData.alt_text_en}
-              onChange={(e) => setFormData({ ...formData, alt_text_en: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-            />
-            <input
-              type="text"
-              placeholder={t('Alt Text (Hindi)', 'Alt Text (हिंदी)')}
-              value={formData.alt_text_hi}
-              onChange={(e) => setFormData({ ...formData, alt_text_hi: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-            />
-          </div>
-          
+
           <select
             value={formData.category}
             onChange={(e) => setFormData({ ...formData, category: e.target.value })}

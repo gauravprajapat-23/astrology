@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiPlay, FiX, FiYoutube, FiClock } from 'react-icons/fi';
 import { supabase } from '@/lib/supabase';
@@ -153,12 +154,17 @@ export default function VideoSection() {
                   {/* Thumbnail */}
                   <div className="relative aspect-video overflow-hidden">
                     {thumbnail && (
-                      <img
-                        src={thumbnail}
-                        alt={language === 'en' ? video.title_en : video.title_hi}
-                        className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
-                        loading="lazy"
-                      />
+                      <div className="relative w-full h-full">
+                        <Image
+                          src={thumbnail}
+                          alt={language === 'en' ? video.title_en : video.title_hi}
+                          className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+                          fill
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          style={{ objectFit: 'cover' }}
+                          priority={false}
+                        />
+                      </div>
                     )}
                     
                     {/* Gradient Overlay */}

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { supabase } from '@/lib/supabase';
 
 interface AdminSession {
@@ -38,13 +38,7 @@ export const AdminAuthProvider: React.FC<{ children: ReactNode }> = ({ children 
                          window.location.hostname === '[::1]');
     }
   }, []);
-
-  // Check authentication status on mount
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
+  const checkAuth = useCallback(async () => {
     try {
       setIsLoading(true);
       
@@ -119,7 +113,13 @@ export const AdminAuthProvider: React.FC<{ children: ReactNode }> = ({ children 
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [isDevelopmentMode]);
+  // Check authentication status on mount
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
