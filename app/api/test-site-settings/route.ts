@@ -15,6 +15,21 @@ export async function GET() {
     }, { status: 500 });
   }
   
+  // Check if we're in a build environment where Supabase may not be available
+  const isBuildEnv = process.env.NEXT_PHASE === 'phase-production-build';
+  
+  if (isBuildEnv) {
+    // Return a mock response during build time
+    console.log('Build environment detected, returning mock data');
+    return NextResponse.json({ 
+      success: true, 
+      data: [],
+      count: 0,
+      is_mock: true,
+      message: 'Mock data returned during build time'
+    });
+  }
+  
   // Create Supabase client inside the function to avoid build-time issues
   const supabase = createClient(
     supabaseUrl,
