@@ -63,6 +63,8 @@ export default function ServiceDetailView({ serviceId }: { serviceId: string }) 
   const [error, setError] = useState<string | null>(null);
   const { language, t } = useLanguage();
 
+  // fetchService is stable here; disable exhaustive-deps warning
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     fetchService();
   }, [serviceId]);

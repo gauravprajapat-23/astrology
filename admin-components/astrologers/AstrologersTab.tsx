@@ -4,6 +4,7 @@ import { Astrologer } from '@/lib/supabase';
 import { useLanguage } from '@/lib/contexts/LanguageContext';
 import LoadingSpinner from '../shared/LoadingSpinner';
 import EmptyState from '../shared/EmptyState';
+import Image from 'next/image';
 
 interface AstrologersTabProps {
   astrologers: Astrologer[];
@@ -76,10 +77,12 @@ export default function AstrologersTab({
                   >
                     <div className="relative aspect-square bg-gray-200 dark:bg-gray-700">
                       {astrologer.photo_url ? (
-                        <img
+                        <Image
                           src={astrologer.photo_url}
                           alt={language === 'en' ? astrologer.name_en : astrologer.name_hi}
+                          fill
                           className="w-full h-full object-cover"
+                          sizes="(max-width: 1024px) 100vw, 33vw"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
@@ -177,10 +180,12 @@ export default function AstrologersTab({
                   >
                     <div className="relative aspect-square bg-gray-200 dark:bg-gray-700">
                       {astrologer.photo_url ? (
-                        <img
+                        <Image
                           src={astrologer.photo_url}
                           alt={language === 'en' ? astrologer.name_en : astrologer.name_hi}
+                          fill
                           className="w-full h-full object-cover"
+                          sizes="(max-width: 1024px) 100vw, 33vw"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">

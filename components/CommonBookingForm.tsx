@@ -1,5 +1,7 @@
 'use client';
 
+/* eslint-disable @next/next/no-img-element */
+
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -58,6 +60,8 @@ export default function CommonBookingForm() {
     return isSelectedItem(item) ? item.id : null;
   };
 
+  // checkPreselectedItems is stable for mount-only effect; silence exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     fetchData();
     checkPreselectedItems();
@@ -115,7 +119,7 @@ export default function CommonBookingForm() {
   };
 
   const handleItemSelect = (item: Service | Astrologer) => {
-    if ('name_en' in item) {
+    if ('base_price' in item) {
       // It's a service
       setBookingData(prev => ({ ...prev, serviceId: item.id, astrologerId: '' }));
     } else {
@@ -384,6 +388,8 @@ export default function CommonBookingForm() {
                 <button
                   onClick={() => setStep(1)}
                   className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                  title={t('Go back', 'वापस जाएं')}
+                  aria-label={t('Go back', 'वापस जाएं')}
                 >
                   <FiX className="w-5 h-5" />
                 </button>

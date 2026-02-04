@@ -146,7 +146,8 @@ export default function AdminDashboard() {
             total_amount: 15000,
             payment_status: 'pending',
             created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
+              astrologer_id: null,
           }
         ]);
         return;
@@ -729,6 +730,8 @@ export default function AdminDashboard() {
   };
 
   // Effect to fetch data based on active tab
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const tabFetchMap: { [key: string]: () => Promise<void> } = {
       services: fetchServices,

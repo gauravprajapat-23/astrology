@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FiUser, FiMail, FiLock, FiShield, FiEye, FiEyeOff, FiAlertCircle, FiCheck } from 'react-icons/fi';
-import { supabase } from '@/lib/supabase';
+import { supabase, type StaffRole } from '@/lib/supabase';
 import { useLanguage } from '@/lib/contexts/LanguageContext';
 import { useRouter } from 'next/navigation';
 
@@ -17,12 +17,74 @@ export default function AdminSignupPanel() {
     password: '',
     confirmPassword: '',
     adminCreationToken: '',
+    roleId: '',
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [roles, setRoles] = useState<StaffRole[]>([]);
+  const [selectedRolePermissions, setSelectedRolePermissions] = useState<string | string[]>('');
+
+  const defaultRoles: StaffRole[] = [
+    {
+      id: 'default-admin',
+      name_en: 'Administrator',
+      name_hi: 'प्रबंधक',
+      description_en: 'Full administrative access',
+      description_hi: 'पूर्ण प्रशासनिक पहुंच',
+      permissions: ['admin', 'staff_management', 'site_settings', 'content_management'],
+      is_active: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    },
+    {
+      id: 'default-editor',
+      name_en: 'Editor',
+      name_hi: 'संपादक',
+      description_en: 'Content management access',
+      description_hi: 'सामग्री प्रबंधन पहुंच',
+      permissions: ['content_management', 'testimonials'],
+      is_active: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    },
+  ];
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const res = await fetch('/api/admin/roles');
+        if (!res.ok) throw new Error('Failed to fetch roles from server');
+        const rolesData = (await res.json()) as StaffRole[];
+
+        if (!rolesData || rolesData.length === 0) {
+          setRoles(defaultRoles);
+          if (!formData.roleId) {
+            setFormData(prev => ({ ...prev, roleId: defaultRoles[0].id }));
+            setSelectedRolePermissions(defaultRoles[0].permissions);
+          }
+        } else {
+          setRoles(rolesData);
+          if (!formData.roleId) {
+            const adminRole = rolesData.find(r => r.name_en === 'Administrator' || r.name_en === 'Admin');
+            setFormData(prev => ({ ...prev, roleId: adminRole ? adminRole.id : rolesData[0].id }));
+            setSelectedRolePermissions(adminRole ? adminRole.permissions : rolesData[0].permissions);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch roles', err);
+        setRoles(defaultRoles);
+        if (!formData.roleId) {
+          setFormData(prev => ({ ...prev, roleId: defaultRoles[0].id }));
+          setSelectedRolePermissions(defaultRoles[0].permissions);
+        }
+      }
+    };
+    fetchRoles();
+  }, [formData.roleId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -32,6 +94,13 @@ export default function AdminSignupPanel() {
     }));
     if (error) setError('');
     if (success) setSuccess('');
+  };
+
+  const handleRoleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { value } = e.target;
+    setFormData(prev => ({ ...prev, roleId: value }));
+    const role = roles.find(r => r.id === value);
+    setSelectedRolePermissions(role ? role.permissions : '');
   };
 
   const validateForm = () => {
@@ -87,6 +156,7 @@ export default function AdminSignupPanel() {
       }
       
       // Call the API endpoint to create the admin user
+      const roleToSend = formData.roleId && !formData.roleId.startsWith('default-') ? formData.roleId : undefined;
       const response = await fetch('/api/admin/signup', {
         method: 'POST',
         headers,
@@ -95,7 +165,7 @@ export default function AdminSignupPanel() {
           lastName: formData.lastName,
           email: formData.email,
           password: formData.password,
-          role_id: '1' // Default to Administrator role
+          role_id: roleToSend
         }),
       });
 
@@ -124,6 +194,7 @@ export default function AdminSignupPanel() {
         password: '',
         confirmPassword: '',
         adminCreationToken: '',
+        roleId: '',
       });
       
       // Redirect to login after a delay
@@ -258,6 +329,30 @@ export default function AdminSignupPanel() {
                   className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-saffron-500 focus:border-transparent transition-all"
                   autoComplete="email"
                 />
+              </div>
+            </div>
+
+            {/* Role Selection */}
+            <div>
+              <label htmlFor="roleId" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                {t('Role', 'भूमिका')} *
+              </label>
+              <div>
+                <select
+                  id="roleId"
+                  name="roleId"
+                  value={formData.roleId}
+                  onChange={handleRoleChange}
+                  className="w-full pl-3 pr-3 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-saffron-500 focus:border-transparent transition-all"
+                >
+                  <option value="">Select a role</option>
+                  {roles.map(r => (
+                    <option key={r.id} value={r.id}>{r.name_en}</option>
+                  ))}
+                </select>
+                {selectedRolePermissions && (
+                  <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">{typeof selectedRolePermissions === 'string' ? selectedRolePermissions : JSON.stringify(selectedRolePermissions)}</p>
+                )}
               </div>
             </div>
 
