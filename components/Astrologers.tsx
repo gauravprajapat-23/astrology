@@ -1,5 +1,7 @@
 'use client';
 
+/* eslint-disable @next/next/no-img-element */
+
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { FiAward, FiStar, FiArrowRight } from 'react-icons/fi';

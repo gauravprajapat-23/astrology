@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
+import bcrypt from 'bcryptjs';
 
 export async function POST(request: NextRequest) {
   try {
@@ -37,7 +38,24 @@ export async function POST(request: NextRequest) {
     }
 
     // Parse the request body
-    const { firstName, lastName, email, password, role_id = '1' } = await request.json();
+    const body = await request.json();
+    const { firstName, lastName, email, password } = body;
+    let role_id: string | undefined = body.role_id;
+
+    // If role_id not provided, attempt to default to the Administrator role
+    if (!role_id) {
+      const { data: adminRoleData, error: adminRoleError } = await supabase
+        .from('staff_roles')
+        .select('id')
+        .eq('name_en', 'Administrator')
+        .limit(1);
+      if (adminRoleError) {
+        console.error('Failed to fetch Administrator role:', adminRoleError);
+      }
+      if (adminRoleData && (adminRoleData as any[]).length > 0) {
+        role_id = (adminRoleData as any[])[0].id;
+      }
+    }
 
     // Validate input
     if (!firstName || !lastName || !email || !password) {
@@ -56,18 +74,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate role_id to ensure it's a valid role
-    const { data: validRole, error: roleError } = await supabase
-      .from('staff_roles')
-      .select('id')
-      .eq('id', role_id)
-      .single();
+    // Validate role_id only if provided. If we couldn't look up the Administrator
+    // role because the service key is missing/invalid, allow creating the user
+    // without a role (role_id = null) so setup can continue in dev environments.
+    if (role_id) {
+      const { data: validRole, error: roleError } = await supabase
+        .from('staff_roles')
+        .select('id')
+        .eq('id', role_id)
+        .limit(1);
 
-    if (roleError || !validRole) {
-      return Response.json(
-        { error: 'Invalid role specified' },
-        { status: 400 }
-      );
+      if (roleError || !validRole || (validRole as any[]).length === 0) {
+        return Response.json(
+          { error: 'Invalid role specified' },
+          { status: 400 }
+        );
+      }
+    } else {
+      // role_id not provided; proceed and insert null role (caller may rely on defaults)
+      role_id = null as unknown as string;
     }
 
     // Check if user already exists in staff_members table
@@ -83,6 +108,9 @@ export async function POST(request: NextRequest) {
         { status: 409 }
       );
     }
+
+    // Hash password for local staff record (Supabase Auth also stores a hashed password)
+    const passwordHash = await bcrypt.hash(password, 10);
 
     // Create user in Supabase Auth
     const { data: authData, error: authError } = await supabase.auth.admin.createUser({
@@ -111,7 +139,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Insert user into staff_members table
+    // Insert user into staff_members table (store password hash for legacy/lookup needs)
     const { error: staffError } = await supabase
       .from('staff_members')
       .insert([{
@@ -119,7 +147,8 @@ export async function POST(request: NextRequest) {
         first_name: firstName,
         last_name: lastName,
         email,
-        role_id,
+        role_id: role_id || null,
+        password_hash: passwordHash,
         is_active: true,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),

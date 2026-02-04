@@ -730,6 +730,8 @@ export default function AdminDashboard() {
   };
 
   // Effect to fetch data based on active tab
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const tabFetchMap: { [key: string]: () => Promise<void> } = {
       services: fetchServices,

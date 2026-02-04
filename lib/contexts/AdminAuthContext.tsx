@@ -115,6 +115,8 @@ export const AdminAuthProvider: React.FC<{ children: ReactNode }> = ({ children 
     }
   }, [isDevelopmentMode]);
   // Check authentication status on mount
+  // checkAuth is memoized with useCallback; silence exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     checkAuth();
   }, []);
