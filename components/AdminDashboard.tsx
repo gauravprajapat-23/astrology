@@ -146,7 +146,8 @@ export default function AdminDashboard() {
             total_amount: 15000,
             payment_status: 'pending',
             created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
+              astrologer_id: null,
           }
         ]);
         return;
