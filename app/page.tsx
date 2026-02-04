@@ -11,12 +11,12 @@ const Carousel = dynamic(() => import('@/components/Carousel'), { ssr: true, loa
 const Hero = dynamic(() => import('@/components/Hero'), { ssr: true, loading: () => <div className="h-screen bg-gradient-to-b from-saffron-50 via-gold-50 to-divine-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900" /> });
 const Services = dynamic(() => import('@/components/Services'), { ssr: true, loading: () => <div className="py-12 bg-gradient-to-b from-white to-saffron-50 dark:from-gray-900 dark:to-gray-800" /> });
 const BookingForm = dynamic(() => import('@/components/BookingForm'), { ssr: true, loading: () => <div className="py-20 bg-white dark:bg-gray-900" /> });
-const About = dynamic(() => import('@/components/About'), { ssr: true, loading: () => <div className="py-20 bg-gradient-to-b from-saffron-50 to-white dark:from-gray-800 dark:to-gray-900" /> });
 const Astrologers = dynamic(() => import('@/components/Astrologers'), { ssr: true, loading: () => <div className="py-20 bg-gradient-to-b from-white to-saffron-50 dark:from-gray-900 dark:to-gray-800" /> });
-const Gallery = dynamic(() => import('@/components/Gallery'), { ssr: true, loading: () => <div className="py-20 bg-white dark:bg-gray-900" /> });
-const Contact = dynamic(() => import('@/components/Contact'), { ssr: true, loading: () => <div className="py-20 bg-gradient-to-b from-white to-saffron-50 dark:from-gray-900 dark:to-gray-800" /> });
 const VideoSection = dynamic(() => import('@/components/VideoSection'), { ssr: true, loading: () => <div className="py-16 bg-gradient-to-b from-white to-saffron-50 dark:from-gray-900 dark:to-gray-800" /> });
 const Footer = dynamic(() => import('@/components/Footer'), { ssr: true });
+const About = dynamic(() => import('@/components/About'), { ssr: true, loading: () => <div className="py-20 bg-white dark:bg-gray-900" /> });
+const Gallery = dynamic(() => import('@/components/Gallery'), { ssr: true, loading: () => <div className="py-20 bg-white dark:bg-gray-900" /> });
+const Contact = dynamic(() => import('@/components/Contact'), { ssr: true, loading: () => <div className="py-20 bg-white dark:bg-gray-900" /> });
 
 
 
@@ -34,28 +34,31 @@ export default function Home() {
           <Suspense fallback={<div className="h-screen bg-gradient-to-b from-saffron-50 via-gold-50 to-divine-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900" />}> 
             <Hero />
           </Suspense>
+            <Suspense fallback={<div className="py-20 bg-gradient-to-b from-white to-saffron-50 dark:from-gray-900 dark:to-gray-800" />}> 
+            <Astrologers />
+          </Suspense>
           <Suspense fallback={<div className="py-12 bg-gradient-to-b from-white to-saffron-50 dark:from-gray-900 dark:to-gray-800" />}> 
             <Services />
           </Suspense>
           <Suspense fallback={<div className="py-20 bg-white dark:bg-gray-900" />}> 
             <BookingForm />
           </Suspense>
-          <Suspense fallback={<div className="py-20 bg-gradient-to-b from-saffron-50 to-white dark:from-gray-800 dark:to-gray-900" />}> 
-            <About />
+        
+          <Suspense fallback={<div className="py-16 bg-gradient-to-b from-white to-saffron-50 dark:from-gray-900 dark:to-gray-800" />}> 
+            <VideoSection />
           </Suspense>
-          <Suspense fallback={<div className="py-20 bg-gradient-to-b from-white to-saffron-50 dark:from-gray-900 dark:to-gray-800" />}> 
-            <Astrologers />
+          <Suspense fallback={<div className="py-20 bg-white dark:bg-gray-900" />}> 
+            <About />
           </Suspense>
           <Suspense fallback={<div className="py-20 bg-white dark:bg-gray-900" />}> 
             <Gallery />
           </Suspense>
-          <Suspense fallback={<div className="py-20 bg-gradient-to-b from-white to-saffron-50 dark:from-gray-900 dark:to-gray-800" />}> 
+          <Suspense fallback={<div className="py-20 bg-white dark:bg-gray-900" />}> 
             <Contact />
           </Suspense>
-          <Suspense fallback={<div className="py-16 bg-gradient-to-b from-white to-saffron-50 dark:from-gray-900 dark:to-gray-800" />}> 
-            <VideoSection />
+          <Suspense fallback={<div className="py-20 bg-white dark:bg-gray-900" />}> 
+            <Footer />
           </Suspense>
-          <Footer />
         </div>
       </LanguageProvider>
     </ThemeProvider>
