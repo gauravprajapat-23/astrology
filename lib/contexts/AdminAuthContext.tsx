@@ -55,40 +55,62 @@ export const AdminAuthProvider: React.FC<{ children: ReactNode }> = ({ children 
       // Check Supabase session
       if (typeof window !== 'undefined') {
         const { data: { session } } = await supabase.auth.getSession();
-        
-        if (session?.user) {
-          // Verify user is staff member with admin permissions
-          const { data: staffData, error: staffError } = await supabase
-            .from('staff_members')
-            .select(`
-              id,
-              first_name,
-              last_name,
-              email,
-              is_active,
-              role:staff_roles(name_en, name_hi, permissions)
-            `)
-            .eq('email', session.user.email)
-            .single();
 
-          if (!staffError && staffData && staffData.is_active) {
-            const permissions = (staffData.role as any)?.permissions || [];
-            if (permissions.includes('admin') || permissions.includes('staff_management')) {
-              const sessionData: AdminSession = {
-                userId: staffData.id,
-                email: staffData.email,
-                name: `${staffData.first_name} ${staffData.last_name}`,
-                role: staffData.role,
-                permissions: permissions
-              };
-              
-              setAdminSession(sessionData);
-              setAdminName(sessionData.name);
-              setIsAuthenticated(true);
-              localStorage.setItem('adminSession', JSON.stringify(sessionData));
-              return;
-            }
+        if (session?.user) {
+        // Verify user is staff member with admin permissions
+        // Try server-side staff lookup (service role) first to avoid RLS issues
+        let staffData: any = null;
+        try {
+          const res = await fetch(`/api/admin/staff?email=${encodeURIComponent(session.user.email || '')}`);
+          if (res.ok) {
+            const json = await res.json();
+            staffData = json.staff;
+          } else {
+            const txt = await res.text();
+            console.warn('Server staff lookup failed', res.status, txt);
           }
+        } catch (e) {
+          console.warn('Server-side staff lookup failed, falling back to client lookup', e);
+        }
+
+        // Fallback: try client-side lookup if server endpoint failed
+        if (!staffData) {
+          try {
+            const { data: sd, error: staffError } = await supabase
+              .from('staff_members')
+              .select(`
+                id,
+                first_name,
+                last_name,
+                email,
+                is_active,
+                role:staff_roles(name_en, name_hi, permissions)
+              `)
+              .eq('email', session.user.email)
+              .single();
+            if (!staffError) staffData = sd;
+          } catch (e) {
+            console.error('Client-side staff lookup failed', e);
+          }
+        }
+
+        if (staffData && staffData.is_active) {
+          const permissions = (staffData.role as any)?.permissions || [];
+          if (permissions.includes('admin') || permissions.includes('staff_management')) {
+            const sessionData: AdminSession = {
+              userId: staffData.id,
+              email: staffData.email,
+              name: `${staffData.first_name} ${staffData.last_name}`,
+              role: staffData.role,
+              permissions: permissions
+            };
+            setAdminSession(sessionData);
+            setAdminName(sessionData.name);
+            setIsAuthenticated(true);
+            localStorage.setItem('adminSession', JSON.stringify(sessionData));
+            return;
+          }
+        }
         }
       }
       
@@ -134,21 +156,43 @@ export const AdminAuthProvider: React.FC<{ children: ReactNode }> = ({ children 
       if (error) throw error;
 
       if (data.user) {
-        // Verify user is staff member
-        const { data: staffData, error: staffError } = await supabase
-          .from('staff_members')
-          .select(`
-            id,
-            first_name,
-            last_name,
-            email,
-            is_active,
-            role:staff_roles(name_en, name_hi, permissions)
-          `)
-          .eq('email', email)
-          .single();
+        // Verify user is staff member — prefer server-side lookup to avoid RLS
+        let staffData: any = null;
+        try {
+          const res = await fetch(`/api/admin/staff?email=${encodeURIComponent(email)}`);
+          if (res.ok) {
+            const json = await res.json();
+            staffData = json.staff;
+          } else {
+            const txt = await res.text();
+            console.warn('Server staff lookup failed', res.status, txt);
+          }
+        } catch (e) {
+          console.warn('Server-side staff lookup failed, falling back to client lookup', e);
+        }
 
-        if (staffError || !staffData) {
+        // Fallback: try client-side lookup if server endpoint failed
+        if (!staffData) {
+          try {
+            const { data: sd, error: staffError } = await supabase
+              .from('staff_members')
+              .select(`
+                id,
+                first_name,
+                last_name,
+                email,
+                is_active,
+                role:staff_roles(name_en, name_hi, permissions)
+              `)
+              .eq('email', email)
+              .single();
+            if (!staffError) staffData = sd;
+          } catch (e) {
+            console.error('Client-side staff lookup failed', e);
+          }
+        }
+
+        if (!staffData) {
           throw new Error('User not found in staff database');
         }
 
@@ -162,11 +206,15 @@ export const AdminAuthProvider: React.FC<{ children: ReactNode }> = ({ children 
           throw new Error('Insufficient permissions');
         }
 
-        // Update last login
-        await supabase
-          .from('staff_members')
-          .update({ last_login: new Date().toISOString() })
-          .eq('id', staffData.id);
+        // Try to update last_login; ignore errors (may be blocked by RLS)
+        try {
+          await supabase
+            .from('staff_members')
+            .update({ last_login: new Date().toISOString() })
+            .eq('id', staffData.id);
+        } catch (e) {
+          console.warn('Could not update last_login (likely RLS):', e);
+        }
 
         // Store session
         const sessionData: AdminSession = {
@@ -181,7 +229,7 @@ export const AdminAuthProvider: React.FC<{ children: ReactNode }> = ({ children 
         setAdminName(sessionData.name);
         setIsAuthenticated(true);
         localStorage.setItem('adminSession', JSON.stringify(sessionData));
-        
+
         return true;
       }
 

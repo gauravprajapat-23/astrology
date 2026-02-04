@@ -120,14 +120,15 @@ export async function POST(request: NextRequest) {
     });
 
     if (authError) {
-      if (authError.message.includes('User already registered')) {
+      if (authError.message && authError.message.includes('User already registered')) {
         return Response.json(
           { error: 'User with this email already exists' },
           { status: 409 }
         );
       }
+      const devDetail = process.env.NODE_ENV !== 'production' ? { detail: authError } : {};
       return Response.json(
-        { error: authError.message || 'Failed to create user' },
+        { error: authError.message || 'Failed to create user', ...devDetail },
         { status: 400 }
       );
     }
@@ -140,7 +141,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Insert user into staff_members table (store password hash for legacy/lookup needs)
-    const { error: staffError } = await supabase
+    const { data: staffInsertData, error: staffError } = await supabase
       .from('staff_members')
       .insert([{
         id: authData.user.id,
@@ -152,20 +153,28 @@ export async function POST(request: NextRequest) {
         is_active: true,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-      }]);
+      }])
+      .select('id, email')
+      .maybeSingle();
 
     if (staffError) {
       // Rollback: delete the user from auth if staff insertion fails
-      await supabase.auth.admin.deleteUser(authData.user.id);
+      try {
+        await supabase.auth.admin.deleteUser(authData.user.id);
+      } catch (delErr) {
+        console.error('Failed to rollback auth user after staff insert failure:', delErr);
+      }
+      const devDetail = process.env.NODE_ENV !== 'production' ? { detail: staffError } : {};
       return Response.json(
-        { error: staffError.message || 'Failed to create staff record' },
+        { error: staffError.message || 'Failed to create staff record', ...devDetail },
         { status: 500 }
       );
     }
 
-    // Return success response (don't expose sensitive information)
+    // Return success response including created staff id/email for debugging
     return Response.json({
-      message: 'Admin account created successfully'
+      message: 'Admin account created successfully',
+      staff: staffInsertData || { id: authData.user.id, email }
     });
   } catch (error) {
     console.error('Admin signup error:', error);
