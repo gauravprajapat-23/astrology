@@ -7,6 +7,7 @@ import { GiLotusFlower, GiFire, GiRingBox, GiTempleGate, GiSun, GiDoor, GiPlanet
 import { supabase, type Service } from '@/lib/supabase';
 import { useLanguage } from '@/lib/contexts/LanguageContext';
 import Link from 'next/link';
+import Section from '@/components/Section';
 
 const iconMap: Record<string, any> = {
   lotus: GiLotusFlower,
@@ -49,7 +50,7 @@ const categoryColors: Record<string, { gradient: string; badge: string; hover: s
 
 const ITEMS_PER_PAGE = 8;
 
-export default function Services() {
+export default function Services({ variant = 'page' }: { variant?: 'landing' | 'page' }) {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -89,7 +90,7 @@ export default function Services() {
 
   if (loading) {
     return (
-      <section className="py-12 sm:py-16 lg:py-24 bg-white dark:bg-gray-900">
+      <section className="py-4 sm:py-16 lg:py-12 bg-white dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="animate-pulse space-y-6 sm:space-y-8">
             <div className="h-10 sm:h-12 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 rounded-xl w-64 sm:w-96 mx-auto"></div>
@@ -105,7 +106,7 @@ export default function Services() {
   }
 
   return (
-    <section id="services" className="relative py-12 sm:py-16 lg:py-24 bg-gradient-to-b from-white via-amber-50/30 to-white dark:from-gray-900 dark:via-slate-900/50 dark:to-gray-900 overflow-hidden">
+    <Section id="services" variant={variant} className="bg-gradient-to-b from-white via-amber-50/30 to-white dark:from-gray-900 dark:via-slate-900/50 dark:to-gray-900 overflow-hidden">
       {/* Background Decoration */}
       <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.08] pointer-events-none">
         <div className="absolute inset-0 bg-mandala bg-repeat"></div>
@@ -383,6 +384,6 @@ export default function Services() {
           </button>
         </motion.div>
       </div>
-    </section>
+    </Section>
   );
 }

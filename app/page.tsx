@@ -34,27 +34,27 @@ export default function Home() {
           <Suspense fallback={<div className="h-screen bg-gradient-to-b from-saffron-50 via-gold-50 to-divine-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900" />}> 
             <Hero />
           </Suspense>
-            <Suspense fallback={<div className="py-20 bg-gradient-to-b from-white to-saffron-50 dark:from-gray-900 dark:to-gray-800" />}> 
+          <Suspense fallback={<div className="py-20 bg-gradient-to-b from-white to-saffron-50 dark:from-gray-900 dark:to-gray-800" />}> 
             <Astrologers />
           </Suspense>
           <Suspense fallback={<div className="py-12 bg-gradient-to-b from-white to-saffron-50 dark:from-gray-900 dark:to-gray-800" />}> 
-            <Services />
+            <Services  variant='landing' />
           </Suspense>
           <Suspense fallback={<div className="py-20 bg-white dark:bg-gray-900" />}> 
-            <BookingForm />
+            <BookingForm variant="landing" />
           </Suspense>
         
           <Suspense fallback={<div className="py-16 bg-gradient-to-b from-white to-saffron-50 dark:from-gray-900 dark:to-gray-800" />}> 
             <VideoSection />
           </Suspense>
           <Suspense fallback={<div className="py-20 bg-white dark:bg-gray-900" />}> 
-            <About />
+            <About variant="landing" />
           </Suspense>
           <Suspense fallback={<div className="py-20 bg-white dark:bg-gray-900" />}> 
-            <Gallery />
+            <Gallery variant="landing" />
           </Suspense>
           <Suspense fallback={<div className="py-20 bg-white dark:bg-gray-900" />}> 
-            <Contact />
+            <Contact/>
           </Suspense>
           <Suspense fallback={<div className="py-20 bg-white dark:bg-gray-900" />}> 
             <Footer />
