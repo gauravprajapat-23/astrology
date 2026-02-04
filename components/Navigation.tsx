@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FiSun, FiMoon, FiMenu, FiX } from 'react-icons/fi';
 import { useTheme } from '@/lib/contexts/ThemeContext';
 import { useLanguage } from '@/lib/contexts/LanguageContext';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -12,6 +14,7 @@ export default function Navigation() {
   const [activeSection, setActiveSection] = useState('home');
   const { isDark, toggleTheme } = useTheme();
   const { language, toggleLanguage, t } = useLanguage();
+  const router = useRouter();
 
   /* -------------------- Effects -------------------- */
   useEffect(() => {
@@ -21,6 +24,14 @@ export default function Navigation() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Scroll to top when navigating to home page
+  useEffect(() => {
+    if (window.location.pathname === '/') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setActiveSection('home');
+    }
+  }, [router]);
 
   useEffect(() => {
     const onScroll = () => {
@@ -44,6 +55,13 @@ export default function Navigation() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  // Reset active section when navigating to home
+  useEffect(() => {
+    if (window.location.pathname === '/') {
+      setActiveSection('home');
+    }
+  }, [router]);
+
   // Lock body scroll when mobile menu is open
   useEffect(() => {
     if (isMobileMenuOpen) {
@@ -59,29 +77,31 @@ export default function Navigation() {
   /* -------------------- Navigation -------------------- */
   const navItems = useMemo(
     () => [
-      { id: 'home', label: t('Home', 'होम'), href: '#home' },
-      { id: 'services', label: t('Services', 'सेवाएं'), href: '#services' },
-      { id: 'astrologers', label: t('Astrologers', 'ज्योतिषी'), href: '#astrologers' },
-      { id: 'about', label: t('About', 'हमारे बारे में'), href: '#about' },
-      { id: 'gallery', label: t('Gallery', 'गैलरी'), href: '#gallery' },
-      { id: 'contact', label: t('Contact', 'संपर्क'), href: '#contact' },
+      { id: 'home', label: t('Home', 'होम'), href: '/' },
+       { id: 'astrologers', label: t('Astrologers', 'ज्योतिषी'), href: '/astrologers' },
+      { id: 'services', label: t('Services', 'सेवाएं'), href: '/services' },
+     
+      { id: 'booking', label: t('Booking', 'बुकिंग'), href: '/booking' },
+      { id: 'about', label: t('About', 'हमारे बारे में'), href: '/about' },
+      { id: 'gallery', label: t('Gallery', 'गैलरी'), href: '/gallery' },
+      { id: 'contact', label: t('Contact', 'संपर्क'), href: '/contact' },
     ],
     [t]
   );
 
   const handleNavClick = useCallback((item: typeof navItems[0]) => {
-    const targetId = item.href.replace('#', '');
-    const element = document.getElementById(targetId);
-    
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      setActiveSection(targetId);
+    if (item.href === '/') {
+      // Handle home navigation - always redirect to home page
+      router.push('/');
+    } else {
+      // Handle all other page navigations
+      router.push(item.href);
     }
     setIsMobileMenuOpen(false);
-  }, []);
+  }, [router]);
 
   const scrollToBooking = () => {
-    document.getElementById('booking')?.scrollIntoView({ behavior: 'smooth' });
+    router.push('/booking');
     setIsMobileMenuOpen(false);
   };
 
@@ -104,7 +124,7 @@ export default function Navigation() {
             {/* -------- Logo -------- */}
             <motion.div
               whileHover={{ scale: 1.05 }}
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              onClick={() => router.push('/')}
               className="flex items-center space-x-3 cursor-pointer group"
             >
               {/* Om Symbol with Glow */}
@@ -283,6 +303,7 @@ export default function Navigation() {
                   <button
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                    title={t('Close Menu', 'मेनू बंद करें')}
                   >
                     <FiX className="w-6 h-6 text-gray-700 dark:text-gray-300" />
                   </button>

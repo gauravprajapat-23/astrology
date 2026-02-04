@@ -46,7 +46,8 @@ export type Service = {
 
 export type Booking = {
   id: string;
-  service_id: string;
+  service_id: string | null;
+  astrologer_id: string | null;
   customer_name: string;
   customer_email: string;
   customer_phone: string;

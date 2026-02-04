@@ -6,6 +6,7 @@ import { FiAward, FiStar, FiArrowRight } from 'react-icons/fi';
 import { GiLotusFlower } from 'react-icons/gi';
 import { supabase, type Astrologer } from '@/lib/supabase';
 import { useLanguage } from '@/lib/contexts/LanguageContext';
+import Link from 'next/link';
 
 export default function Astrologers() {
   const [astrologers, setAstrologers] = useState<Astrologer[]>([]);
@@ -176,14 +177,28 @@ export default function Astrologers() {
                     ))}
                   </div>
 
-                  {/* View Profile Button */}
-                  <button className="group/btn relative w-full py-3 bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500 text-white rounded-xl font-bold text-sm shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></div>
-                    <div className="relative flex items-center justify-center space-x-2">
-                      <span>{t('View Profile', 'प्रोफ़ाइल देखें')}</span>
-                      <FiArrowRight className="w-4 h-4 transform group-hover/btn:translate-x-1 transition-transform duration-300" />
-                    </div>
-                  </button>
+                  {/* Action Buttons */}
+                  <div className="space-y-3">
+                    <Link 
+                      href={`/astrologers/${astrologer.id}`}
+                      className="group/btn relative w-full py-2.5 bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500 text-white rounded-lg font-bold text-sm shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 overflow-hidden block text-center"
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></div>
+                      <div className="relative flex items-center justify-center space-x-2">
+                        <span>{t('View Profile', 'प्रोफ़ाइल देखें')}</span>
+                        <FiArrowRight className="w-4 h-4 transform group-hover/btn:translate-x-1 transition-transform duration-300" />
+                      </div>
+                    </Link>
+                    <button
+                      onClick={() => {
+                        localStorage.setItem('selectedAstrologer', astrologer.id);
+                        window.location.href = '/booking';
+                      }}
+                      className="w-full py-2.5 border-2 border-violet-500 text-violet-600 dark:text-violet-400 rounded-lg font-medium text-sm hover:bg-violet-50 dark:hover:bg-gray-700 transition-all duration-300"
+                    >
+                      {t('Book Consultation', 'परामर्श बुक करें')}
+                    </button>
+                  </div>
                 </div>
 
                 {/* Bottom Corner Decoration */}
