@@ -8,7 +8,9 @@ import { FiChevronLeft, FiChevronRight, FiStar, FiAward, FiUsers, FiTrendingUp }
 import { supabase, type Testimonial } from '@/lib/supabase';
 import { useLanguage } from '@/lib/contexts/LanguageContext';
 
-export default function About() {
+import Section from '@/components/Section';
+
+export default function About({ variant = 'page' }: { variant?: 'landing' | 'page' }) {
   const { language, t } = useLanguage();
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -70,7 +72,7 @@ export default function About() {
   ];
 
   return (
-    <section id="about" className="relative py-16 sm:py-20 lg:py-28 bg-gradient-to-b from-amber-50/50 via-white to-rose-50/30 dark:from-gray-800/50 dark:via-gray-900 dark:to-slate-900/50 overflow-hidden">
+    <Section id="about" variant={variant} className="bg-gradient-to-b from-amber-50/50 via-white to-rose-50/30 dark:from-gray-800/50 dark:via-gray-900 dark:to-slate-900/50 overflow-hidden">
       {/* Background Decorations */}
       <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.08]">
         <div className="absolute inset-0 bg-mandala bg-repeat"></div>
@@ -347,6 +349,6 @@ export default function About() {
           </div>
         )}
       </div>
-    </section>
+    </Section>
   );
 }

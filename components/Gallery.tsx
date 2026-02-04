@@ -7,7 +7,9 @@ import { FiX, FiChevronLeft, FiChevronRight, FiMaximize2 } from 'react-icons/fi'
 import { supabase, type GalleryImage } from '@/lib/supabase';
 import { useLanguage } from '@/lib/contexts/LanguageContext';
 
-export default function Gallery() {
+import Section from '@/components/Section';
+
+export default function Gallery({ variant = 'page' }: { variant?: 'landing' | 'page' }) {
   const { language, t } = useLanguage();
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
   const [loading, setLoading] = useState(true);
@@ -58,7 +60,7 @@ export default function Gallery() {
 
   if (loading) {
     return (
-      <section className="py-16 sm:py-20 lg:py-28 bg-white dark:bg-gray-900">
+      <Section variant={variant} className="bg-white dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="animate-pulse space-y-8">
             <div className="h-12 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 rounded-xl w-48 mx-auto"></div>
@@ -69,14 +71,14 @@ export default function Gallery() {
             </div>
           </div>
         </div>
-      </section>
+      </Section>
     );
   }
 
   if (galleryImages.length === 0) return null;
 
   return (
-    <section id="gallery" className="relative py-16 sm:py-20 lg:py-28 bg-gradient-to-b from-white via-amber-50/30 to-white dark:from-gray-900 dark:via-slate-900/50 dark:to-gray-900 overflow-hidden">
+    <Section id="gallery" variant={variant} className="bg-gradient-to-b from-white via-amber-50/30 to-white dark:from-gray-900 dark:via-slate-900/50 dark:to-gray-900 overflow-hidden">
       {/* Background Decorations */}
       <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.08]">
         <div className="absolute inset-0 bg-mandala bg-repeat"></div>
@@ -270,6 +272,6 @@ export default function Gallery() {
           </motion.div>
         )}
       </AnimatePresence>
-    </section>
+    </Section>
   );
 }
