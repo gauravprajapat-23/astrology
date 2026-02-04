@@ -464,67 +464,116 @@ export default function AdminDashboard() {
         return;
       }
       
-      // RLS Policy Issue Detected - Using mock data fallback
-      console.log('RLS Policy Issue Detected: infinite recursion in staff_members policy');
-      console.log('Using mock data as fallback...');
-      
-      // Mock data for staff members to avoid RLS recursion
-      setStaffMembers([
-        {
-          id: '00000000-0000-0000-0000-000000000001',
-          first_name: 'Admin',
-          last_name: 'User',
-          email: 'admin@astrology.com',
-          phone: '+91-9876543210',
-          role_id: '00000000-0000-0000-0000-000000000001',
-          password_hash: 'hashed_password',
-          avatar_url: '',
-          is_active: true,
-          last_login: new Date().toISOString(),
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          role: {
-            id: '00000000-0000-0000-0000-000000000001',
-            name_en: 'Administrator',
-            name_hi: 'प्रशासक',
-            description_en: 'Full system access',
-            description_hi: 'पूर्ण सिस्टम पहुंच',
-            permissions: ['admin', 'staff_management'],
-            is_active: true,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+      // Attempt to fetch real staff members from Supabase
+      try {
+        const { data, error } = await supabase
+          .from('staff_members')
+          .select(`
+            id,
+            first_name,
+            last_name,
+            email,
+            phone,
+            role_id,
+            avatar_url,
+            is_active,
+            last_login,
+            created_at,
+            updated_at,
+            role:staff_roles(id, name_en, name_hi, description_en, description_hi, permissions, is_active)
+          `)
+          .order('created_at', { ascending: false });
+
+        console.log('Staff members data:', data);
+        console.log('Staff members error:', error);
+
+        if (error) {
+          console.warn('Failed to fetch staff_members (possible RLS). Attempting server-side fallback.', error.message || error);
+          // Try server-side staff-list endpoint (requires SUPABASE_SERVICE_ROLE_KEY)
+          try {
+            const res = await fetch('/api/admin/staff-list');
+            if (res.ok) {
+              const json = await res.json();
+              if (Array.isArray(json.staff)) {
+                setStaffMembers(json.staff as StaffMember[]);
+                return;
+              }
+            } else {
+              const txt = await res.text();
+              console.warn('Server staff-list lookup failed', res.status, txt);
+            }
+          } catch (e) {
+            console.warn('Server staff-list fallback failed', e);
           }
-        },
-        {
-          id: '00000000-0000-0000-0000-000000000002',
-          first_name: 'Content',
-          last_name: 'Manager',
-          email: 'content@astrology.com',
-          phone: '+91-9876543211',
-          role_id: '00000000-0000-0000-0000-000000000002',
-          password_hash: 'hashed_password',
-          avatar_url: '',
-          is_active: true,
-          last_login: new Date().toISOString(),
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          role: {
-            id: '00000000-0000-0000-0000-000000000002',
-            name_en: 'Content Manager',
-            name_hi: 'सामग्री प्रबंधक',
-            description_en: 'Manage content and testimonials',
-            description_hi: 'सामग्री और प्रशंसापत्र प्रबंधित करें',
-            permissions: ['content_management', 'testimonials', 'gallery'],
-            is_active: true,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          }
+
+          // Final fallback: use a single mock admin so UI remains usable
+          setStaffMembers([
+            {
+              id: '00000000-0000-0000-0000-000000000001',
+              first_name: 'Admin',
+              last_name: 'User',
+              email: 'admin@astrology.com',
+              phone: '+91-9876543210',
+            password_hash: 'hashed_password',
+              role_id: '00000000-0000-0000-000000000001',
+              avatar_url: '',
+              is_active: true,
+              last_login: new Date().toISOString(),
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              role: {
+                id: '00000000-0000-0000-0000-000000000001',
+                name_en: 'Administrator',
+                name_hi: 'प्रशासक',
+                description_en: 'Full system access',
+                description_hi: 'पूर्ण सिस्टम पहुंच',
+                permissions: ['admin', 'staff_management'],
+                is_active: true,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+              }
+            }
+          ]);
+          return;
         }
-      ]);
-      
-      // RLS policy issue resolved with mock data
-      console.log('Staff members loaded successfully with mock data');
-      return;
+
+        // Normalize joined role (returned as array) to `role` object
+        setStaffMembers((data || []).map((member: any) => {
+          const role = Array.isArray(member.role) ? member.role[0] : member.role;
+          return { ...member, role, role_id: member.role_id || (role?.id ?? null) } as StaffMember;
+        }));
+      } catch (err) {
+        console.error('Error fetching staff members:', err);
+        showError('Failed to fetch staff members: ' + ((err as Error).message || err));
+        // Fallback to mock data to keep UI usable
+        setStaffMembers([
+          {
+            id: '00000000-0000-0000-0000-000000000001',
+            first_name: 'Admin',
+            last_name: 'User',
+            email: 'admin@astrology.com',
+            phone: '+91-9876543210',
+            role_id: '00000000-0000-0000-0000-000000000001',
+            password_hash: 'hashed_password',
+            avatar_url: '',
+            is_active: true,
+            last_login: new Date().toISOString(),
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            role: {
+              id: '00000000-0000-0000-0000-000000000001',
+              name_en: 'Administrator',
+              name_hi: 'प्रशासक',
+              description_en: 'Full system access',
+              description_hi: 'पूर्ण सिस्टम पहुंच',
+              permissions: ['admin', 'staff_management'],
+              is_active: true,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            }
+          }
+        ]);
+      }
     } catch (error) {
       console.error('Error fetching staff members:', error);
       console.error('Error details:', {
