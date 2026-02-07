@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FiX, FiUser, FiMail, FiPhone, FiStar } from 'react-icons/fi';
 import { supabase } from '@/lib/supabase';
+import { uploadAdminImage } from '@/lib/adminUpload';
 import { useLanguage } from '@/lib/contexts/LanguageContext';
 
 interface AddAstrologerModalProps {
@@ -13,6 +14,7 @@ interface AddAstrologerModalProps {
 export default function AddAstrologerModal({ onClose, onSuccess, onError }: AddAstrologerModalProps) {
   const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
     name_en: '',
     name_hi: '',
@@ -25,33 +27,30 @@ export default function AddAstrologerModal({ onClose, onSuccess, onError }: AddA
   });
   const [photoFile, setPhotoFile] = useState<File | null>(null);
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const result = await uploadAdminImage({ file, bucket: 'astrologer-photos' });
+      setFormData({ ...formData, photo_url: result.url });
+      setPhotoFile(file);
+    } catch (error: any) {
+      console.error('Error uploading photo:', error);
+      onError(error.message || 'Failed to upload photo');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     
     try {
-      let finalPhotoUrl = formData.photo_url;
-      
-      // Upload photo if selected
-      if (photoFile) {
-        const formDataUpload = new FormData();
-        formDataUpload.append('file', photoFile);
-        formDataUpload.append('bucket', 'astrologer-photos');
-              
-        const response = await fetch('/api/admin/upload-image', {
-          method: 'POST',
-          body: formDataUpload,
-        });
-              
-        const result = await response.json();
-              
-        if (!response.ok) {
-          throw new Error(result.error || 'Failed to upload photo');
-        }
-              
-        finalPhotoUrl = result.url;
-      }
-      
+      const finalPhotoUrl = formData.photo_url;
+
       const { error } = await supabase
         .from('astrologers')
         .insert([{
@@ -168,12 +167,8 @@ export default function AddAstrologerModal({ onClose, onSuccess, onError }: AddA
               type="file"
               id="photo-upload"
               accept="image/*"
-              onChange={(e) => {
-                if (e.target.files && e.target.files[0]) {
-                  setPhotoFile(e.target.files[0]);
-                  setFormData({ ...formData, photo_url: URL.createObjectURL(e.target.files[0]) });
-                }
-              }}
+              onChange={handleImageUpload}
+              disabled={uploading}
               className="hidden"
             />
             <label 
@@ -217,7 +212,7 @@ export default function AddAstrologerModal({ onClose, onSuccess, onError }: AddA
             whileTap={{ scale: 0.98 }}
             type="submit"
             onClick={handleSubmit}
-            disabled={loading}
+            disabled={loading || uploading}
             className="w-full bg-gradient-to-r from-pink-500 to-rose-600 text-white py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? t('Adding...', 'जोड़ रहे हैं...') : t('Add Astrologer', 'ज्योतिषी जोड़ें')}

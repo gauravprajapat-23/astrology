@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FiX, FiUser, FiMail, FiPhone, FiStar, FiUpload } from 'react-icons/fi';
 import { supabase, type Astrologer } from '@/lib/supabase';
+import { uploadAdminImage } from '@/lib/adminUpload';
 import { useLanguage } from '@/lib/contexts/LanguageContext';
 
 interface EditAstrologerModalProps {
@@ -25,7 +26,6 @@ export default function EditAstrologerModal({ astrologer, onClose, onSuccess, on
     specializations: Array.isArray(astrologer.specializations) ? astrologer.specializations : [],
     is_active: astrologer.is_active,
   });
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -33,23 +33,8 @@ export default function EditAstrologerModal({ astrologer, onClose, onSuccess, on
 
     setUploading(true);
     try {
-      const formDataUpload = new FormData();
-      formDataUpload.append('file', file);
-      formDataUpload.append('bucket', 'astrologer-photos');
-      
-      const response = await fetch('/api/admin/upload-image', {
-        method: 'POST',
-        body: formDataUpload,
-      });
-      
-      const result = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to upload image');
-      }
-      
+      const result = await uploadAdminImage({ file, bucket: 'astrologer-photos' });
       setFormData({ ...formData, photo_url: result.url });
-      setPhotoFile(file);
     } catch (error: any) {
       console.error('Error uploading image:', error);
       onError(error.message || 'Failed to upload image');
@@ -63,28 +48,8 @@ export default function EditAstrologerModal({ astrologer, onClose, onSuccess, on
     setLoading(true);
     
     try {
-      let finalPhotoUrl = formData.photo_url;
-      
-      // Upload photo if selected
-      if (photoFile) {
-        const formDataUpload = new FormData();
-        formDataUpload.append('file', photoFile);
-        formDataUpload.append('bucket', 'astrologer-photos');
-              
-        const response = await fetch('/api/admin/upload-image', {
-          method: 'POST',
-          body: formDataUpload,
-        });
-              
-        const result = await response.json();
-              
-        if (!response.ok) {
-          throw new Error(result.error || 'Failed to upload photo');
-        }
-              
-        finalPhotoUrl = result.url;
-      }
-      
+      const finalPhotoUrl = formData.photo_url;
+
       const { error } = await supabase
         .from('astrologers')
         .update({
@@ -249,7 +214,7 @@ export default function EditAstrologerModal({ astrologer, onClose, onSuccess, on
             whileTap={{ scale: 0.98 }}
             type="submit"
             onClick={handleSubmit}
-            disabled={loading}
+            disabled={loading || uploading}
             className="w-full bg-gradient-to-r from-pink-500 to-rose-600 text-white py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? t('Updating...', 'अपडेट कर रहे हैं...') : t('Update Astrologer', 'ज्योतिषी अपडेट करें')}

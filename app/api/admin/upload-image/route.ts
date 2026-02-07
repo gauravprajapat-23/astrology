@@ -45,9 +45,12 @@ const hasAdminPermissions = async (userId: string) => {
 
 export async function POST(request: NextRequest) {
   try {
-    // Get the session from the cookie
+    // Get the access token from header or cookie
+    const authHeader = request.headers.get('authorization');
+    const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
     const cookieStore = cookies();
-    const accessToken = cookieStore.get('sb-access-token')?.value;
+    const cookieAccessToken = cookieStore.get('sb-access-token')?.value;
+    const accessToken = bearerToken || cookieAccessToken;
     
     if (!accessToken) {
       return Response.json(
@@ -62,14 +65,8 @@ export async function POST(request: NextRequest) {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
-    // Set the access token
-    await tempClient.auth.setSession({
-      access_token: accessToken,
-      refresh_token: cookieStore.get('sb-refresh-token')?.value || ''
-    });
-
     // Get user info
-    const { data: { user }, error: userError } = await tempClient.auth.getUser();
+    const { data: { user }, error: userError } = await tempClient.auth.getUser(accessToken);
     
     if (userError || !user) {
       return Response.json(

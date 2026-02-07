@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FiX, FiUser, FiMail, FiPhone, FiUpload } from 'react-icons/fi';
 import { supabase, type StaffMember, type StaffRole } from '@/lib/supabase';
+import { uploadAdminImage } from '@/lib/adminUpload';
 import { useLanguage } from '@/lib/contexts/LanguageContext';
 
 interface EditStaffModalProps {
@@ -26,7 +27,6 @@ export default function EditStaffModal({ staff, roles, onClose, onSuccess, onErr
     is_active: staff.is_active,
     new_password: '',
   });
-  const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -34,23 +34,8 @@ export default function EditStaffModal({ staff, roles, onClose, onSuccess, onErr
 
     setUploading(true);
     try {
-      const formDataUpload = new FormData();
-      formDataUpload.append('file', file);
-      formDataUpload.append('bucket', 'staff-avatars');
-      
-      const response = await fetch('/api/admin/upload-image', {
-        method: 'POST',
-        body: formDataUpload,
-      });
-      
-      const result = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to upload image');
-      }
-      
+      const result = await uploadAdminImage({ file, bucket: 'staff-avatars' });
       setFormData({ ...formData, avatar_url: result.url });
-      setAvatarFile(file);
     } catch (error: any) {
       console.error('Error uploading image:', error);
       onError(error.message || 'Failed to upload image');
@@ -64,27 +49,7 @@ export default function EditStaffModal({ staff, roles, onClose, onSuccess, onErr
     setLoading(true);
     
     try {
-      let finalAvatarUrl = formData.avatar_url;
-      
-      // Upload avatar if selected
-      if (avatarFile) {
-        const formDataUpload = new FormData();
-        formDataUpload.append('file', avatarFile);
-        formDataUpload.append('bucket', 'staff-avatars');
-              
-        const response = await fetch('/api/admin/upload-image', {
-          method: 'POST',
-          body: formDataUpload,
-        });
-              
-        const result = await response.json();
-              
-        if (!response.ok) {
-          throw new Error(result.error || 'Failed to upload avatar');
-        }
-              
-        finalAvatarUrl = result.url;
-      }
+      const finalAvatarUrl = formData.avatar_url;
       
       // Prepare update data
       const updateData: any = {
@@ -273,7 +238,7 @@ export default function EditStaffModal({ staff, roles, onClose, onSuccess, onErr
             whileTap={{ scale: 0.98 }}
             type="submit"
             onClick={handleSubmit}
-            disabled={loading}
+            disabled={loading || uploading}
             className="w-full bg-gradient-to-r from-emerald-500 to-green-600 text-white py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? t('Updating...', 'अपडेट कर रहे हैं...') : t('Update Staff Member', 'कर्मचारी अपडेट करें')}

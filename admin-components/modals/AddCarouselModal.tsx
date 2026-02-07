@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FiX, FiImage, FiUpload } from 'react-icons/fi';
 import { supabase } from '@/lib/supabase';
+import { uploadAdminImage } from '@/lib/adminUpload';
 import { useLanguage } from '@/lib/contexts/LanguageContext';
 
 interface AddCarouselModalProps {
@@ -31,21 +32,7 @@ export default function AddCarouselModal({ onClose, onSuccess, onError }: AddCar
 
     setUploading(true);
     try {
-      const formDataUpload = new FormData();
-      formDataUpload.append('file', file);
-      formDataUpload.append('bucket', 'carousel-images');
-      
-      const response = await fetch('/api/admin/upload-image', {
-        method: 'POST',
-        body: formDataUpload,
-      });
-      
-      const result = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to upload image');
-      }
-      
+      const result = await uploadAdminImage({ file, bucket: 'carousel-images' });
       setFormData({ ...formData, image_url: result.url });
     } catch (error: any) {
       console.error('Error uploading image:', error);
