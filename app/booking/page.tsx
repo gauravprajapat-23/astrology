@@ -8,7 +8,7 @@ export const metadata = {
   title: 'Book Consultation | Vedic Astrology Services',
   description: 'Book your personalized Vedic astrology consultation with our expert astrologers.',
 };
-
+// This is the booking page
 export default function BookingPage() {
   return (
     <ThemeProvider>
