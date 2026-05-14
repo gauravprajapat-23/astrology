@@ -19,16 +19,51 @@ type CarouselItem = {
   is_active: boolean;
 };
 
+// Dummy carousel data
+const DUMMY_CAROUSEL_ITEMS: CarouselItem[] = [
+  {
+    id: '1',
+    title_en: 'Authentic Vedic Rituals',
+    title_hi: 'प्रामाणिक वैदिक अनुष्ठान',
+    description_en: 'Experience the divine power of ancient Vedic ceremonies performed by expert priests',
+    description_hi: 'विशेषज्ञ पुजारियों द्वारा किए गए प्राचीन वैदिक समारोहों की दिव्य शक्ति का अनुभव करें',
+    image_url: 'https://images.unsplash.com/photo-1621959342768-1d35a44d7b9f?w=1920&q=80',
+    link: '/services',
+    is_active: true
+  },
+  {
+    id: '2',
+    title_en: 'Expert Astrologers',
+    title_hi: 'विशेषज्ञ ज्योतिषी',
+    description_en: 'Get accurate life predictions and remedies from our panel of experienced astrologers',
+    description_hi: 'हमारे अनुभवी ज्योतिषियों के पैनल से सटीक जीवन भविष्यवाणियां और उपचार प्राप्त करें',
+    image_url: 'https://images.unsplash.com/photo-1598555845116-f5e383082a70?w=1920&q=80',
+    link: '/astrologers',
+    is_active: true
+  },
+  {
+    id: '3',
+    title_en: 'Sacred Temple Ceremonies',
+    title_hi: 'पवित्र मंदिर समारोह',
+    description_en: 'Book personalized pujas and rituals for peace, prosperity and spiritual growth',
+    description_hi: 'शांति, समृद्धि और आध्यात्मिक विकास के लिए व्यक्तिगत पूजा और अनुष्ठान बुक करें',
+    image_url: 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=1920&q=80',
+    link: '/booking',
+    is_active: true
+  }
+];
+
 export default function Carousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [items, setItems] = useState<CarouselItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [items, setItems] = useState<CarouselItem[]>(DUMMY_CAROUSEL_ITEMS);
+  const [loading, setLoading] = useState(false); // No loading needed for static data
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [direction, setDirection] = useState(0);
   const { language, t } = useLanguage();
 
   useEffect(() => {
-    fetchCarouselItems();
+    // No data fetching needed - using static data
+    setItems(DUMMY_CAROUSEL_ITEMS);
   }, []);
   const nextSlide = useCallback(() => {
     setDirection(1);
@@ -50,22 +85,7 @@ export default function Carousel() {
     return () => clearInterval(interval);
   }, [isAutoPlaying, items.length, nextSlide]);
 
-  const fetchCarouselItems = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('carousel_items')
-        .select('*')
-        .eq('is_active', true)
-        .order('created_at', { ascending: true });
 
-      if (error) throw error;
-      setItems(data || []);
-    } catch (error) {
-      console.error('Error fetching carousel items:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
 
   const goToSlide = useCallback((index: number) => {

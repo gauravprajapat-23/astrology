@@ -10,23 +10,72 @@ import { useLanguage } from '@/lib/contexts/LanguageContext';
 
 import Section from '@/components/Section';
 
+// Dummy testimonial data
+const DUMMY_TESTIMONIALS: Testimonial[] = [
+  {
+    id: '1',
+    customer_name: 'Rajesh Kumar',
+    customer_photo: '',
+    rating: 5,
+    review_en: 'The Rudrabhishek ceremony was beautifully performed. Very professional and spiritual experience.',
+    review_hi: 'रुद्राभिषेक समारोह खूबसूरती से किया गया। बहुत ही पेशेवर और आध्यात्मिक अनुभव।',
+    ritual_name: 'Rudrabhishek Puja',
+    is_featured: true,
+    email: 'rajesh.k@example.com',
+    phone: '+91 98765 43210',
+    service_used: 'Rudrabhishek',
+    status: 'approved',
+    verified: true,
+    response: 'Thank you for your kind words!',
+    created_at: '2024-01-15T00:00:00Z'
+  },
+  {
+    id: '2',
+    customer_name: 'Priya Sharma',
+    customer_photo: '',
+    rating: 5,
+    review_en: 'Excellent astrology consultation. The predictions were accurate and remedies really helped.',
+    review_hi: 'उत्कृष्ट ज्योतिष परामर्श। भविष्यवाणियां सटीक थीं और उपायों ने वास्तव में मदद की।',
+    ritual_name: 'Kundali Reading',
+    is_featured: true,
+    email: 'priya.s@example.com',
+    phone: '+91 98765 43211',
+    service_used: 'Astrology',
+    status: 'approved',
+    verified: true,
+    response: 'We are glad to help you!',
+    created_at: '2024-01-20T00:00:00Z'
+  },
+  {
+    id: '3',
+    customer_name: 'Amit Patel',
+    customer_photo: '',
+    rating: 5,
+    review_en: 'Our wedding ceremony was perfectly organized with all Vedic rituals. Highly recommended!',
+    review_hi: 'हमारा विवाह समारोह सभी वैदिक अनुष्ठानों के साथ पूरी तरह से आयोजित किया गया था। अत्यधिक अनुशंसित!',
+    ritual_name: 'Vedic Wedding',
+    is_featured: true,
+    email: 'amit.p@example.com',
+    phone: '+91 98765 43212',
+    service_used: 'Wedding Ceremony',
+    status: 'approved',
+    verified: true,
+    response: 'Blessings to the newlyweds!',
+    created_at: '2024-02-01T00:00:00Z'
+  }
+];
+
 export default function About({ variant = 'page' }: { variant?: 'landing' | 'page' }) {
   const { language, t } = useLanguage();
-  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>(DUMMY_TESTIMONIALS);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
-    fetchTestimonials();
+    // No data fetching needed - using static data
+    setTestimonials(DUMMY_TESTIMONIALS);
   }, []);
 
-  const fetchTestimonials = async () => {
-    const { data } = await supabase
-      .from('testimonials')
-      .select('*')
-      .eq('is_featured', true)
-      .order('created_at', { ascending: false });
-    setTestimonials(data || []);
-  };
+
 
   const nextTestimonial = useCallback(() => {
     setCurrentIndex((prev) => (prev + 1) % testimonials.length);

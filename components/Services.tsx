@@ -50,32 +50,126 @@ const categoryColors: Record<string, { gradient: string; badge: string; hover: s
 
 const ITEMS_PER_PAGE = 8;
 
+// Dummy service data
+const DUMMY_SERVICES: Service[] = [
+  {
+    id: '1',
+    name_en: 'Rudrabhishek Puja',
+    name_hi: 'रुद्राभिषेक पूजा',
+    description_en: 'Sacred ritual bath to Lord Shiva with milk, honey, and holy water for spiritual purification and blessings.',
+    description_hi: 'आध्यात्मिक शुद्धि और आशीर्वाद के लिए दूध, शहद और पवित्र जल के साथ भगवान शिव को पवित्र अनुष्ठान स्नान।',
+    duration_minutes: 90,
+    base_price: 2500,
+    icon: 'shiva',
+    category: 'puja',
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '2',
+    name_en: 'Ganesh Puja',
+    name_hi: 'गणेश पूजा',
+    description_en: 'Worship of Lord Ganesha to remove obstacles and bring prosperity to new beginnings.',
+    description_hi: 'बाधाओं को दूर करने और नई शुरुआत में समृद्धि लाने के लिए भगवान गणेश की पूजा।',
+    duration_minutes: 60,
+    base_price: 1500,
+    icon: 'lotus',
+    category: 'puja',
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '3',
+    name_en: 'Navagraha Puja',
+    name_hi: 'नवग्रह पूजा',
+    description_en: 'Ritual worship of nine celestial bodies to harmonize planetary influences in your life.',
+    description_hi: 'अपने जीवन में ग्रहों के प्रभावों को सामंजस्यपूर्ण बनाने के लिए नौ खगोलीय निकायों की अनुष्ठान पूजा।',
+    duration_minutes: 120,
+    base_price: 3500,
+    icon: 'planet',
+    category: 'astrology',
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '4',
+    name_en: 'Marriage Matching',
+    name_hi: 'विवाह मिलान',
+    description_en: 'Comprehensive Kundali matching for marital compatibility using ancient Vedic astrology principles.',
+    description_hi: 'प्राचीन वैदिक ज्योतिष सिद्धांतों का उपयोग करके वैवाहिक संगतता के लिए व्यापक कुंडली मिलान।',
+    duration_minutes: 45,
+    base_price: 1800,
+    icon: 'rings',
+    category: 'astrology',
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '5',
+    name_en: 'House Warming Ceremony',
+    name_hi: 'गृह प्रवेश समारोह',
+    description_en: 'Vastu-compliant Griha Pravesh puja to bless your new home with positive energy and prosperity.',
+    description_hi: 'सकारात्मक ऊर्जा और समृद्धि के साथ अपने नए घर को आशीर्वाद देने के लिए वास्तु-अनुपालित गृह प्रवेश पूजा।',
+    duration_minutes: 180,
+    base_price: 5000,
+    icon: 'home',
+    category: 'ceremony',
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '6',
+    name_en: 'Satyanarayan Katha',
+    name_hi: 'सत्यनारायण कथा',
+    description_en: 'Auspicious recitation of Lord Vishnus divine stories for peace, prosperity and family welfare.',
+    description_hi: 'शांति, समृद्धि और परिवार के कल्याण के लिए भगवान विष्णु की दिव्य कहानियों का मंगलमय पाठ।',
+    duration_minutes: 150,
+    base_price: 4000,
+    icon: 'sun',
+    category: 'puja',
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '7',
+    name_en: 'Vastu Consultation',
+    name_hi: 'वास्तु परामर्श',
+    description_en: 'Expert analysis of your propertys energy flow and recommendations for Vastu compliance.',
+    description_hi: 'आपकी संपत्ति की ऊर्जा प्रवाह का विशेषज्ञ विश्लेषण और वास्तु अनुपालन के लिए सिफारिशें।',
+    duration_minutes: 90,
+    base_price: 3000,
+    icon: 'door',
+    category: 'vastu',
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '8',
+    name_en: 'Namkaran Sanskar',
+    name_hi: 'नामकरण संस्कार',
+    description_en: 'Sacred naming ceremony for newborns based on astrological calculations and Vedic traditions.',
+    description_hi: 'ज्योतिषीय गणना और वैदिक परंपराओं के आधार पर नवजात शिशुओं के लिए पवित्र नामकरण समारोह।',
+    duration_minutes: 75,
+    base_price: 2200,
+    icon: 'lotus',
+    category: 'ceremony',
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z'
+  }
+];
+
 export default function Services({ variant = 'page' }: { variant?: 'landing' | 'page' }) {
-  const [services, setServices] = useState<Service[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [services, setServices] = useState<Service[]>(DUMMY_SERVICES);
+  const [loading, setLoading] = useState(false); // No loading needed for static data
   const [currentPage, setCurrentPage] = useState(1);
   const { language, t } = useLanguage();
 
   useEffect(() => {
-    fetchServices();
+    // No data fetching needed - using static data
+    setServices(DUMMY_SERVICES);
   }, []);
 
-  const fetchServices = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('services')
-        .select('*')
-        .eq('is_active', true)
-        .order('category', { ascending: true });
 
-      if (error) throw error;
-      setServices(data || []);
-    } catch (error) {
-      console.error('Error fetching services:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Pagination logic
   const totalPages = Math.ceil(services.length / ITEMS_PER_PAGE);
