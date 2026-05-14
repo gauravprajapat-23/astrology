@@ -9,33 +9,127 @@ import { useLanguage } from '@/lib/contexts/LanguageContext';
 
 import Section from '@/components/Section';
 
+// Dummy gallery data
+const DUMMY_GALLERY_IMAGES: GalleryImage[] = [
+  {
+    id: '1',
+    title_en: 'Rudrabhishek Ceremony',
+    title_hi: 'रुद्राभिषेक समारोह',
+    description_en: 'Sacred ritual bath performed to Lord Shiva',
+    description_hi: 'भगवान शिव को पवित्र अनुष्ठान स्नान',
+    image_url: 'https://images.unsplash.com/photo-1621959342768-1d35a44d7b9f?w=800&q=80',
+    category: 'puja',
+    sort_order: 1,
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '2',
+    title_en: 'Ganesh Puja',
+    title_hi: 'गणेश पूजा',
+    description_en: 'Worship of Lord Ganesha for new beginnings',
+    description_hi: 'नई शुरुआत के लिए भगवान गणेश की पूजा',
+    image_url: 'https://images.unsplash.com/photo-1567591414480-c9e7e2879281?w=800&q=80',
+    category: 'puja',
+    sort_order: 2,
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '3',
+    title_en: 'Vedic Wedding Ceremony',
+    title_hi: 'वैदिक विवाह समारोह',
+    description_en: 'Traditional Hindu wedding rituals',
+    description_hi: 'पारंपरिक हिंदू विवाह अनुष्ठान',
+    image_url: 'https://images.unsplash.com/photo-1587271407850-8d438fa5f22b?w=800&q=80',
+    category: 'ceremony',
+    sort_order: 3,
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '4',
+    title_en: 'Temple Architecture',
+    title_hi: 'मंदिर वास्तुकला',
+    description_en: 'Beautiful ancient temple design',
+    description_hi: 'सुंदर प्राचीन मंदिर डिजाइन',
+    image_url: 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=800&q=80',
+    category: 'temple',
+    sort_order: 4,
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '5',
+    title_en: 'Navagraha Puja',
+    title_hi: 'नवग्रह पूजा',
+    description_en: 'Worship of nine celestial bodies',
+    description_hi: 'नौ खगोलीय निकायों की पूजा',
+    image_url: 'https://images.unsplash.com/photo-1598555845116-f5e383082a70?w=800&q=80',
+    category: 'puja',
+    sort_order: 5,
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '6',
+    title_en: 'Spiritual Gathering',
+    title_hi: 'आध्यात्मिक सभा',
+    description_en: 'Devotees participating in sacred ceremony',
+    description_hi: 'पवित्र समारोह में भाग लेते भक्त',
+    image_url: 'https://images.unsplash.com/photo-1518156677180-95a2893f3e9f?w=800&q=80',
+    category: 'ceremony',
+    sort_order: 6,
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '7',
+    title_en: 'Yajna Ritual',
+    title_hi: 'यज्ञ अनुष्ठान',
+    description_en: 'Fire ceremony for peace and prosperity',
+    description_hi: 'शांति और समृद्धि के लिए अग्नि समारोह',
+    image_url: 'https://images.unsplash.com/photo-1605218427306-635ba2439af7?w=800&q=80',
+    category: 'puja',
+    sort_order: 7,
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '8',
+    title_en: 'Flower Decorations',
+    title_hi: 'फूल सजावट',
+    description_en: 'Traditional floral arrangements for puja',
+    description_hi: 'पूजा के लिए पारंपरिक पुष्प व्यवस्था',
+    image_url: 'https://images.unsplash.com/photo-1507643179173-617d654551a3?w=800&q=80',
+    category: 'decoration',
+    sort_order: 8,
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
+  }
+];
+
 export default function Gallery({ variant = 'page' }: { variant?: 'landing' | 'page' }) {
   const { language, t } = useLanguage();
-  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>(DUMMY_GALLERY_IMAGES);
+  const [loading, setLoading] = useState(false); // No loading needed for static data
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   useEffect(() => {
-    fetchGalleryImages();
+    // No data fetching needed - using static data
+    setGalleryImages(DUMMY_GALLERY_IMAGES);
   }, []);
 
-  const fetchGalleryImages = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('gallery_images')
-        .select('*')
-        .eq('is_active', true)
-        .order('sort_order', { ascending: true });
 
-      if (error) throw error;
-      setGalleryImages(data || []);
-    } catch (error) {
-      console.error('Error fetching gallery images:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const openLightbox = (image: GalleryImage, index: number) => {
     setSelectedImage(image);

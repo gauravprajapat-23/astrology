@@ -19,10 +19,92 @@ type BookingData = {
 
 import Section from '@/components/Section';
 
+// Dummy service data for booking
+const DUMMY_SERVICES: Service[] = [
+  {
+    id: '1',
+    name_en: 'Rudrabhishek Puja',
+    name_hi: 'रुद्राभिषेक पूजा',
+    description_en: 'Sacred ritual bath to Lord Shiva',
+    description_hi: 'भगवान शिव को पवित्र अनुष्ठान स्नान',
+    duration_minutes: 90,
+    base_price: 2500,
+    icon: 'shiva',
+    category: 'puja',
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '2',
+    name_en: 'Ganesh Puja',
+    name_hi: 'गणेश पूजा',
+    description_en: 'Worship of Lord Ganesha',
+    description_hi: 'भगवान गणेश की पूजा',
+    duration_minutes: 60,
+    base_price: 1500,
+    icon: 'lotus',
+    category: 'puja',
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '3',
+    name_en: 'Navagraha Puja',
+    name_hi: 'नवग्रह पूजा',
+    description_en: 'Worship of nine celestial bodies',
+    description_hi: 'नौ खगोलीय निकायों की पूजा',
+    duration_minutes: 120,
+    base_price: 3500,
+    icon: 'planet',
+    category: 'astrology',
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '4',
+    name_en: 'Marriage Matching',
+    name_hi: 'विवाह मिलान',
+    description_en: 'Kundali matching for marriage',
+    description_hi: 'विवाह के लिए कुंडली मिलान',
+    duration_minutes: 45,
+    base_price: 1800,
+    icon: 'rings',
+    category: 'astrology',
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '5',
+    name_en: 'House Warming Ceremony',
+    name_hi: 'गृह प्रवेश समारोह',
+    description_en: 'Vastu-compliant Griha Pravesh puja',
+    description_hi: 'वास्तु-अनुपालित गृह प्रवेश पूजा',
+    duration_minutes: 180,
+    base_price: 5000,
+    icon: 'home',
+    category: 'ceremony',
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '6',
+    name_en: 'Satyanarayan Katha',
+    name_hi: 'सत्यनारायण कथा',
+    description_en: 'Recitation of Lord Vishnus stories',
+    description_hi: 'भगवान विष्णु की कहानियों का पाठ',
+    duration_minutes: 150,
+    base_price: 4000,
+    icon: 'sun',
+    category: 'puja',
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z'
+  }
+];
+
 export default function BookingForm({ variant = 'page' }: { variant?: 'landing' | 'page' }) {
   const { language, t } = useLanguage();
   const [step, setStep] = useState(1);
-  const [services, setServices] = useState<Service[]>([]);
+  const [services, setServices] = useState<Service[]>(DUMMY_SERVICES);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -38,10 +120,9 @@ export default function BookingForm({ variant = 'page' }: { variant?: 'landing' 
     specialNotes: '',
   });
 
-  // validateStep is stable in this component; silence exhaustive-deps
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    fetchServices();
+    // No data fetching needed - using static data
     const selectedService = localStorage.getItem('selectedService');
     if (selectedService) {
       setBookingData(prev => ({ ...prev, serviceId: selectedService }));
@@ -59,10 +140,7 @@ export default function BookingForm({ variant = 'page' }: { variant?: 'landing' 
     }
   }, [step]);
 
-  const fetchServices = async () => {
-    const { data } = await supabase.from('services').select('*').eq('is_active', true);
-    setServices(data || []);
-  };
+
 
   const validateStep = (currentStep: number): boolean => {
     const newErrors: Record<string, string> = {};

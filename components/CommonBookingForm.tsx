@@ -32,8 +32,6 @@ type BookingData = {
 export default function CommonBookingForm() {
   const { language, t } = useLanguage();
   const [step, setStep] = useState(1);
-  const [services, setServices] = useState<Service[]>([]);
-  const [astrologers, setAstrologers] = useState<Astrologer[]>([]);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -52,6 +50,117 @@ export default function CommonBookingForm() {
     specialNotes: '',
   });
 
+  // Use the same dummy data as Services and Astrologers components
+  const DUMMY_SERVICES: Service[] = [
+    {
+      id: '1',
+      name_en: 'Rudrabhishek Puja',
+      name_hi: 'रुद्राभिषेक पूजा',
+      description_en: 'Sacred ritual bath to Lord Shiva with milk, honey, and holy water for spiritual purification and blessings.',
+      description_hi: 'आध्यात्मिक शुद्धि और आशीर्वाद के लिए दूध, शहद और पवित्र जल के साथ भगवान शिव को पवित्र अनुष्ठान स्नान।',
+      duration_minutes: 90,
+      base_price: 2500,
+      icon: 'shiva',
+      category: 'puja',
+      is_active: true,
+      created_at: '2024-01-01T00:00:00Z'
+    },
+    {
+      id: '2',
+      name_en: 'Ganesh Puja',
+      name_hi: 'गणेश पूजा',
+      description_en: 'Worship of Lord Ganesha to remove obstacles and bring prosperity to new beginnings.',
+      description_hi: 'बाधाओं को दूर करने और नई शुरुआत में समृद्धि लाने के लिए भगवान गणेश की पूजा।',
+      duration_minutes: 60,
+      base_price: 1500,
+      icon: 'lotus',
+      category: 'puja',
+      is_active: true,
+      created_at: '2024-01-01T00:00:00Z'
+    },
+    {
+      id: '3',
+      name_en: 'Navagraha Puja',
+      name_hi: 'नवग्रह पूजा',
+      description_en: 'Ritual worship of nine celestial bodies to harmonize planetary influences in your life.',
+      description_hi: 'अपने जीवन में ग्रहों के प्रभावों को सामंजस्यपूर्ण बनाने के लिए नौ खगोलीय निकायों की अनुष्ठान पूजा।',
+      duration_minutes: 120,
+      base_price: 3500,
+      icon: 'planet',
+      category: 'astrology',
+      is_active: true,
+      created_at: '2024-01-01T00:00:00Z'
+    },
+    {
+      id: '4',
+      name_en: 'Marriage Matching',
+      name_hi: 'विवाह मिलान',
+      description_en: 'Comprehensive Kundali matching for marital compatibility using ancient Vedic astrology principles.',
+      description_hi: 'प्राचीन वैदिक ज्योतिष सिद्धांतों का उपयोग करके वैवाहिक संगतता के लिए व्यापक कुंडली मिलान।',
+      duration_minutes: 45,
+      base_price: 1800,
+      icon: 'rings',
+      category: 'astrology',
+      is_active: true,
+      created_at: '2024-01-01T00:00:00Z'
+    }
+  ];
+
+  const DUMMY_ASTROLOGERS: Astrologer[] = [
+    {
+      id: '1',
+      name_en: 'Dr. Rajesh Sharma',
+      name_hi: 'डॉ. राजेश शर्मा',
+      bio_en: 'Expert in Vedic astrology and Kundali matching with over 20 years of experience.',
+      bio_hi: '20 वर्ष से अधिक के अनुभव के साथ वैदिक ज्योतिष और कुंडली मिलान में विशेषज्ञ।',
+      photo_url: '',
+      experience_years: 20,
+      specializations: ['Kundali', 'Vastu', 'Marriage Matching'],
+      is_active: true,
+      created_at: '2024-01-01T00:00:00Z'
+    },
+    {
+      id: '2',
+      name_en: 'Pandit Vikram Joshi',
+      name_hi: 'पंडित विक्रम जोशी',
+      bio_en: 'Specialist in Rudrabhishek and ancient Vedic rituals with deep spiritual knowledge.',
+      bio_hi: 'गहन आध्यात्मिक ज्ञान के साथ रुद्राभिषेक और प्राचीन वैदिक अनुष्ठानों में विशेषज्ञ।',
+      photo_url: '',
+      experience_years: 15,
+      specializations: ['Puja', 'Rituals', 'Spiritual Healing'],
+      is_active: true,
+      created_at: '2024-01-01T00:00:00Z'
+    },
+    {
+      id: '3',
+      name_en: 'Acharya Meena Patel',
+      name_hi: 'आचार्य मीना पटेल',
+      bio_en: 'Renowned for accurate predictions and remedies in dosha nivaran.',
+      bio_hi: 'दोष निवारण में सटीक भविष्यवाणियों और उपचारों के लिए प्रसिद्ध।',
+      photo_url: '',
+      experience_years: 18,
+      specializations: ['Dosha Nivaran', 'Gemstones', 'Horoscope'],
+      is_active: true,
+      created_at: '2024-01-01T00:00:00Z'
+    },
+    {
+      id: '4',
+      name_en: 'Guruji Anil Kumar',
+      name_hi: 'गुरुजी अनिल कुमार',
+      bio_en: 'Master of Vastu Shastra and planetary gemology consultations.',
+      bio_hi: 'वास्तु शास्त्र और ग्रह रत्न विद्या परामर्श के मास्टर।',
+      photo_url: '',
+      experience_years: 25,
+      specializations: ['Vastu', 'Gemology', 'Career Guidance'],
+      is_active: true,
+      created_at: '2024-01-01T00:00:00Z'
+    }
+  ];
+
+  // Initialize with dummy data
+  const [services, setServices] = useState<Service[]>(DUMMY_SERVICES);
+  const [astrologers, setAstrologers] = useState<Astrologer[]>(DUMMY_ASTROLOGERS);
+
   const isSelectedItem = (item: Service | Astrologer | null): item is Service | Astrologer => {
     return item !== null;
   };
@@ -60,32 +169,12 @@ export default function CommonBookingForm() {
     return isSelectedItem(item) ? item.id : null;
   };
 
-  // checkPreselectedItems is stable for mount-only effect; silence exhaustive-deps
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    fetchData();
+    // No data fetching needed - using static data
     checkPreselectedItems();
   }, []);
 
-  const fetchData = async () => {
-    try {
-      // Fetch services
-      const { data: servicesData } = await supabase
-        .from('services')
-        .select('*')
-        .eq('is_active', true);
-      setServices(servicesData || []);
 
-      // Fetch astrologers
-      const { data: astrologersData } = await supabase
-        .from('astrologers')
-        .select('*')
-        .eq('is_active', true);
-      setAstrologers(astrologersData || []);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
 
   const checkPreselectedItems = () => {
     // Check for pre-selected service

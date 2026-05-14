@@ -12,32 +12,118 @@ import Link from 'next/link';
 
 const ITEMS_PER_PAGE = 8;
 
+// Dummy astrologer data
+const DUMMY_ASTROLOGERS: Astrologer[] = [
+  {
+    id: '1',
+    name_en: 'Dr. Rajesh Sharma',
+    name_hi: 'डॉ. राजेश शर्मा',
+    bio_en: 'Expert in Vedic astrology and Kundali matching with over 20 years of experience.',
+    bio_hi: '20 वर्ष से अधिक के अनुभव के साथ वैदिक ज्योतिष और कुंडली मिलान में विशेषज्ञ।',
+    photo_url: '',
+    experience_years: 20,
+    specializations: ['Kundali', 'Vastu', 'Marriage Matching'],
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '2',
+    name_en: 'Pandit Vikram Joshi',
+    name_hi: 'पंडित विक्रम जोशी',
+    bio_en: 'Specialist in Rudrabhishek and ancient Vedic rituals with deep spiritual knowledge.',
+    bio_hi: 'गहन आध्यात्मिक ज्ञान के साथ रुद्राभिषेक और प्राचीन वैदिक अनुष्ठानों में विशेषज्ञ।',
+    photo_url: '',
+    experience_years: 15,
+    specializations: ['Puja', 'Rituals', 'Spiritual Healing'],
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '3',
+    name_en: 'Acharya Meena Patel',
+    name_hi: 'आचार्य मीना पटेल',
+    bio_en: 'Renowned for accurate predictions and remedies in dosha nivaran.',
+    bio_hi: 'दोष निवारण में सटीक भविष्यवाणियों और उपचारों के लिए प्रसिद्ध।',
+    photo_url: '',
+    experience_years: 18,
+    specializations: ['Dosha Nivaran', 'Gemstones', 'Horoscope'],
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '4',
+    name_en: 'Guruji Anil Kumar',
+    name_hi: 'गुरुजी अनिल कुमार',
+    bio_en: 'Master of Vastu Shastra and planetary gemology consultations.',
+    bio_hi: 'वास्तु शास्त्र और ग्रह रत्न विद्या परामर्श के मास्टर।',
+    photo_url: '',
+    experience_years: 25,
+    specializations: ['Vastu', 'Gemology', 'Career Guidance'],
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '5',
+    name_en: 'Dr. Sunita Verma',
+    name_hi: 'डॉ. सुनीता वर्मा',
+    bio_en: 'Expert in relationship compatibility and family counseling through astrology.',
+    bio_hi: 'ज्योतिष के माध्यम से रिश्ते की संगतता और परिवार परामर्श में विशेषज्ञ।',
+    photo_url: '',
+    experience_years: 12,
+    specializations: ['Relationship', 'Family Counseling', 'Love Problems'],
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '6',
+    name_en: 'Pandit Arun Mishra',
+    name_hi: 'पंडित अरुण मिश्रा',
+    bio_en: 'Specialist in Navagraha puja and Vedic ceremonies for peace and prosperity.',
+    bio_hi: 'शांति और समृद्धि के लिए नवग्रह पूजा और वैदिक समारोहों में विशेषज्ञ।',
+    photo_url: '',
+    experience_years: 22,
+    specializations: ['Navagraha', 'Ceremonies', 'Business Growth'],
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '7',
+    name_en: 'Acharya Kavita Singh',
+    name_hi: 'आचार्य कविता सिंह',
+    bio_en: 'Expert in child horoscope analysis and naming ceremonies.',
+    bio_hi: 'बाल कुंडली विश्लेषण और नामकरण समारोहों में विशेषज्ञ।',
+    photo_url: '',
+    experience_years: 10,
+    specializations: ['Child Horoscope', 'Naming Ceremony', 'Education'],
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '8',
+    name_en: 'Dr. Manoj Gupta',
+    name_hi: 'डॉ. मनोज गुप्ता',
+    bio_en: 'Renowned for health astrology and medical muhurat consultations.',
+    bio_hi: 'स्वास्थ्य ज्योतिष और चिकित्सा मुहूर्त परामर्श के लिए प्रसिद्ध।',
+    photo_url: '',
+    experience_years: 16,
+    specializations: ['Health Astrology', 'Medical Muhurat', 'Yoga'],
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z'
+  }
+];
+
 export default function Astrologers() {
-  const [astrologers, setAstrologers] = useState<Astrologer[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [astrologers, setAstrologers] = useState<Astrologer[]>(DUMMY_ASTROLOGERS);
+  const [loading, setLoading] = useState(false); // No loading needed for static data
   const [currentPage, setCurrentPage] = useState(1);
   const { language, t } = useLanguage();
 
   useEffect(() => {
-    fetchAstrologers();
+    // No data fetching needed - using static data
+    setAstrologers(DUMMY_ASTROLOGERS);
   }, []);
 
-  const fetchAstrologers = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('astrologers')
-        .select('*')
-        .eq('is_active', true)
-        .order('experience_years', { ascending: false });
 
-      if (error) throw error;
-      setAstrologers(data || []);
-    } catch (error) {
-      console.error('Error fetching astrologers:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Pagination logic
   const totalPages = Math.ceil(astrologers.length / ITEMS_PER_PAGE);

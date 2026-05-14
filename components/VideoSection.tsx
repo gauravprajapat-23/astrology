@@ -22,33 +22,106 @@ type Video = {
   created_at: string;
 };
 
+// Dummy video data
+const DUMMY_VIDEOS: Video[] = [
+  {
+    id: '1',
+    title_en: 'Complete Rudrabhishek Ritual Guide',
+    title_hi: 'पूर्ण रुद्राभिषेक अनुष्ठान मार्गदर्शिका',
+    description_en: 'Learn the sacred steps of performing Rudrabhishek with Vedic mantras',
+    description_hi: 'वैदिक मंत्रों के साथ रुद्राभिषेक करने के पवित्र कदम सीखें',
+    youtube_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    thumbnail_url: 'https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
+    duration: '15:30',
+    category: 'Rituals',
+    is_featured: true,
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '2',
+    title_en: 'Ganesh Puja Benefits',
+    title_hi: 'गणेश पूजा के लाभ',
+    description_en: 'Discover the spiritual benefits of worshipping Lord Ganesha',
+    description_hi: 'भगवान गणेश की पूजा करने के आध्यात्मिक लाभ जानें',
+    youtube_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    thumbnail_url: 'https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
+    duration: '12:45',
+    category: 'Puja',
+    is_featured: true,
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '3',
+    title_en: 'Understanding Kundali Matching',
+    title_hi: 'कुंडली मिलान को समझना',
+    description_en: 'Expert astrologer explains the importance of Kundali matching for marriage',
+    description_hi: 'विशेषज्ञ ज्योतिषी विवाह के लिए कुंडली मिलान के महत्व को समझाते हैं',
+    youtube_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    thumbnail_url: 'https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
+    duration: '18:20',
+    category: 'Astrology',
+    is_featured: false,
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '4',
+    title_en: 'Vastu Tips for Home',
+    title_hi: 'घर के लिए वास्तु टिप्स',
+    description_en: 'Simple Vastu remedies to bring peace and prosperity to your home',
+    description_hi: 'अपने घर में शांति और समृद्धि लाने के लिए सरल वास्तु उपाय',
+    youtube_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    thumbnail_url: 'https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
+    duration: '10:15',
+    category: 'Vastu',
+    is_featured: false,
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '5',
+    title_en: 'Navagraha Mantra Chanting',
+    title_hi: 'नवग्रह मंत्र जाप',
+    description_en: 'Powerful Navagraha mantras for planetary harmony',
+    description_hi: 'ग्रह सामंजस्य के लिए शक्तिशाली नवग्रह मंत्र',
+    youtube_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    thumbnail_url: 'https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
+    duration: '20:00',
+    category: 'Mantras',
+    is_featured: true,
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '6',
+    title_en: 'Temple Architecture Significance',
+    title_hi: 'मंदिर वास्तुकला का महत्व',
+    description_en: 'Explore the spiritual significance of ancient temple architecture',
+    description_hi: 'प्राचीन मंदिर वास्तुकला के आध्यात्मिक महत्व का अन्वेषण करें',
+    youtube_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    thumbnail_url: 'https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
+    duration: '14:50',
+    category: 'Culture',
+    is_featured: false,
+    is_active: true,
+    created_at: '2024-01-01T00:00:00Z'
+  }
+];
+
 export default function VideoSection() {
-  const [videos, setVideos] = useState<Video[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [videos, setVideos] = useState<Video[]>(DUMMY_VIDEOS);
+  const [loading, setLoading] = useState(false); // No loading needed for static data
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   const { language, t } = useLanguage();
 
   useEffect(() => {
-    fetchVideos();
+    // No data fetching needed - using static data
+    setVideos(DUMMY_VIDEOS);
   }, []);
 
-  const fetchVideos = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('videos')
-        .select('*')
-        .eq('is_active', true)
-        .order('is_featured', { ascending: false })
-        .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setVideos(data || []);
-    } catch (error) {
-      console.error('Error fetching videos:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const getYouTubeVideoId = (url: string) => {
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
